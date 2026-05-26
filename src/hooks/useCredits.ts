@@ -4,12 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 export function useCredits() {
-  const { user } = useAuth();
+  const { user, firebaseUser } = useAuth();
   const [credits, setCredits] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchCredits = useCallback(async () => {
-    if (!user) {
+    if (!user || !firebaseUser) {
       setCredits(0);
       setLoading(false);
       return;
@@ -17,7 +17,7 @@ export function useCredits() {
 
     setLoading(true);
     try {
-      const token = await user.getIdToken();
+      const token = await firebaseUser.getIdToken();
       const res = await fetch("/api/account/credits", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -28,7 +28,7 @@ export function useCredits() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, firebaseUser]);
 
   useEffect(() => {
     fetchCredits();

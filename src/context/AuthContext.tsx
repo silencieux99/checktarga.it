@@ -61,10 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const tokenResult = await nextUser.getIdTokenResult();
       const email = (nextUser.email || "").toLowerCase();
       const allowedEmails = getAllowedAdminEmails();
-      const appUser: AppUser = {
-        ...nextUser,
+      const appUser = Object.assign(nextUser, {
         admin: tokenResult.claims.admin === true || allowedEmails.includes(email),
-      };
+      }) as AppUser;
       setUser(appUser);
       setLoading(false);
     });

@@ -43,7 +43,7 @@ const STEPS = [
 
 function SuccessContent() {
   const searchParams = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
+  const { user, firebaseUser, loading: authLoading } = useAuth();
   const orderId = searchParams.get("order_id");
   const sessionId = searchParams.get("session_id");
   const paymentIntentId = searchParams.get("payment_intent");
@@ -82,8 +82,8 @@ function SuccessContent() {
           sessionStorage.setItem(sessionKey, "processing");
 
           const headers: HeadersInit = { "Content-Type": "application/json" };
-          if (user) {
-            headers.Authorization = `Bearer ${await user.getIdToken()}`;
+          if (firebaseUser) {
+            headers.Authorization = `Bearer ${await firebaseUser.getIdToken()}`;
           }
 
           await fetch("/api/process-payment-success", {

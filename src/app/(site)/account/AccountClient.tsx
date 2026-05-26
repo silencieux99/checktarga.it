@@ -25,7 +25,7 @@ import { formatItalianPlate, validatePlate, validateVin } from "@/lib/vehicle";
 
 export default function AccountClient() {
   const router = useRouter();
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, firebaseUser, loading: authLoading, signOut } = useAuth();
   const { credits, loading: creditsLoading, refresh: refreshCredits } = useCredits();
 
   const [showGenerateModal, setShowGenerateModal] = useState(false);
@@ -65,7 +65,7 @@ export default function AccountClient() {
       return;
     }
 
-    if (!user) return;
+    if (!user || !firebaseUser) return;
 
     setIsGenerating(true);
     setGenerateError(null);
@@ -85,7 +85,7 @@ export default function AccountClient() {
 
       setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountCallingAPI]);
 
-      const token = await user.getIdToken();
+      const token = await firebaseUser.getIdToken();
       const response = await fetch("/api/reports/generate", {
         method: "POST",
         headers: {

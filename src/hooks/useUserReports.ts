@@ -25,7 +25,7 @@ interface UserReportsResponse {
 }
 
 export function useUserReports() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, firebaseUser, loading: authLoading } = useAuth();
   const [reports, setReports] = useState<UserReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +34,7 @@ export function useUserReports() {
 
   const fetchReports = useCallback(
     async (forceRefresh = false) => {
-      if (!user || authLoading) {
+      if (!user || !firebaseUser || authLoading) {
         setLoading(false);
         return;
       }
@@ -48,7 +48,7 @@ export function useUserReports() {
         setLoading(true);
         setError(null);
         setIndexUrl(null);
-        const token = await user.getIdToken();
+        const token = await firebaseUser.getIdToken();
         const response = await fetch("/api/user-reports", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -79,7 +79,7 @@ export function useUserReports() {
         setLoading(false);
       }
     },
-    [user, authLoading, lastFetch]
+    [user, firebaseUser, authLoading, lastFetch]
   );
 
   useEffect(() => {
