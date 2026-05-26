@@ -2,7 +2,7 @@ export const SITE = {
   name: "CheckTarga",
   domain: "checktarga.it",
   tagline: "Verifica lo storico del veicolo prima di acquistare",
-  supportEmail: "assistenza@checktarga.it",
+  supportEmail: "contact@checktarga.it",
   locale: "it-IT",
   currency: "eur",
   currencySymbol: "€",

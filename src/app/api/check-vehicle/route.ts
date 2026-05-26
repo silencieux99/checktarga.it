@@ -16,8 +16,19 @@ export async function GET(req: NextRequest) {
     const cleaned = cleanQuery(query, type);
     const data = await lookupVehicle(cleaned, type);
 
+    if (!data.found) {
+      return NextResponse.json(
+        {
+          found: false,
+          error: data.error || "Veicolo non trovato",
+          data,
+        },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({
-      found: data.found,
+      found: true,
       data,
     });
   } catch (error) {

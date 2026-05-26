@@ -33,7 +33,10 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} {SITE.name}. Tutti i diritti riservati.
+        © {new Date().getFullYear()} {SITE.name}. Tutti i diritti riservati.{" "}
+        <a href={`mailto:${SITE.supportEmail}`} className="hover:text-teal-700">
+          {SITE.supportEmail}
+        </a>
       </div>
     </footer>
   );

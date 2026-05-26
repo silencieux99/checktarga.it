@@ -1,37 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { getPlanBySku } from "@/lib/pricing";
-import { addCredits } from "@/lib/credits";
-import { getAdminDb } from "@/lib/firebase-admin";
+import { verifyFirebaseToken } from "@/lib/firebase-admin";
+import { fulfillPackOrder } from "@/lib/order-fulfillment";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, sessionId } = await req.json();
+    const body = await req.json();
+    const { orderId, sessionId, paymentIntentId, customerEmail } = body as {
+      orderId?: string;
+      sessionId?: string;
+      paymentIntentId?: string;
+      customerEmail?: string;
+    };
 
-    if (!orderId && !sessionId) {
-      return NextResponse.json({ error: "orderId o sessionId richiesto" }, { status: 400 });
+    if (!orderId && !sessionId && !paymentIntentId) {
+      return NextResponse.json({ error: "orderId, sessionId o paymentIntentId richiesto" }, { status: 400 });
     }
 
-    const db = getAdminDb();
-    if (!db || !stripe) {
-      return NextResponse.json({ error: "Servizio non configurato" }, { status: 500 });
+    const authHeader = req.headers.get("authorization");
+    let decodedToken = null;
+    if (authHeader?.startsWith("Bearer ")) {
+      decodedToken = await verifyFirebaseToken(authHeader.substring(7));
     }
 
-    let resolvedOrderId = orderId as string | undefined;
-    let paymentIntentId: string | undefined;
+    let resolvedOrderId = orderId;
 
-    if (sessionId) {
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
-      paymentIntentId = session.payment_intent as string;
-      if (!resolvedOrderId && session.metadata?.orderId) {
-        resolvedOrderId = session.metadata.orderId;
+    if (!resolvedOrderId && paymentIntentId) {
+      const { resolveOrderIdFromPaymentIntent } = await import("@/lib/order-fulfillment");
+      resolvedOrderId = (await resolveOrderIdFromPaymentIntent(paymentIntentId)) || undefined;
+    }
+
+    if (!resolvedOrderId && sessionId) {
+      const { stripe } = await import("@/lib/stripe");
+      if (stripe) {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        resolvedOrderId = session.metadata?.orderId;
       }
     }
 
     if (!resolvedOrderId) {
       return NextResponse.json({ error: "Ordine non trovato" }, { status: 404 });
+    }
+
+    const { getAdminDb } = await import("@/lib/firebase-admin");
+    const db = getAdminDb();
+    if (!db) {
+      return NextResponse.json({ error: "Database non configurato" }, { status: 500 });
     }
 
     const orderSnap = await db.collection("orders").doc(resolvedOrderId).get();
@@ -40,36 +55,58 @@ export async function POST(req: NextRequest) {
     }
 
     const order = orderSnap.data()!;
-    if (order.status === "COMPLETE") {
-      return NextResponse.json({
-        ok: true,
-        creditsAdded: order.creditsAdded || order.creditsToAdd || 0,
-      });
+
+    if (decodedToken && order.customerUid && order.customerUid !== decodedToken.uid) {
+      return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
     }
 
-    if (paymentIntentId) {
-      const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
-      if (pi.status !== "succeeded") {
-        return NextResponse.json({ error: "Pagamento non completato" }, { status: 402 });
+    if (!decodedToken && customerEmail) {
+      const orderEmail = String(order.customerEmail || "").toLowerCase();
+      if (orderEmail !== customerEmail.toLowerCase()) {
+        return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
       }
     }
 
-    const plan = getPlanBySku(order.sku);
-    const credits = plan?.reports || order.creditsToAdd || 0;
-
-    await db.collection("orders").doc(resolvedOrderId).update({
-      status: "COMPLETE",
-      paymentIntentId: paymentIntentId || order.paymentIntentId || null,
-      creditsAdded: credits,
-      paidAt: Date.now(),
-      updatedAt: Date.now(),
+    const result = await fulfillPackOrder({
+      orderId: resolvedOrderId,
+      sessionId,
+      paymentIntentId,
+      source: "process-payment-success",
     });
 
-    if (order.customerUid && credits > 0) {
-      await addCredits(order.customerUid, credits, order.sku, "Conferma pagamento success page");
+    if (!result) {
+      return NextResponse.json({ error: "Impossibile elaborare l'ordine" }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true, creditsAdded: credits });
+    if (result.status === "PROCESSING") {
+      return NextResponse.json(
+        { success: false, retry: true, status: result.status },
+        { status: 409 }
+      );
+    }
+
+    if (result.status === "PENDING") {
+      return NextResponse.json(
+        { success: false, retry: true, status: result.status },
+        { status: 202 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      ok: true,
+      alreadyProcessed: result.alreadyProcessed || false,
+      creditsAdded: result.creditsAdded,
+      credits: result.creditsAdded,
+      totalCredits: result.totalCredits,
+      newAccount: result.newAccount,
+      password: result.password,
+      customerEmail: result.customerEmail,
+      productName: result.productName,
+      amount: result.amount,
+      emailSent: result.emailSent,
+      status: result.status,
+    });
   } catch (error) {
     console.error("[process-payment-success]", error);
     return NextResponse.json({ error: "Errore elaborazione" }, { status: 500 });

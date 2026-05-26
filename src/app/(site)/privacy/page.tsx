@@ -9,7 +9,7 @@ export default function PrivacyPage() {
       </p>
       <p>
         I dati sono conservati su infrastrutture cloud con accesso limitato al personale autorizzato.
-        Puoi richiedere accesso, rettifica o cancellazione scrivendo a assistenza@checktarga.it.
+        Puoi richiedere accesso, rettifica o cancellazione scrivendo a contact@checktarga.it.
       </p>
     </LegalLayout>
   );

@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
       brand: vehicleInfo.brand || null,
       model: vehicleInfo.model || null,
       newAccount: guest.newAccount,
+      guestCheckout: true,
       password: guest.password || null,
       createdAt: now,
       updatedAt: now,

@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPlanBySku, formatPrice } from "@/lib/pricing";
 import { Loader2, Mail, ShieldCheck } from "lucide-react";
+import PageLoader from "@/components/PageLoader";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 function CheckoutContent() {
   const router = useRouter();
@@ -62,15 +64,19 @@ function CheckoutContent() {
   };
 
   if (!plan) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-teal-700" />
-      </div>
-    );
+    return <PageLoader message="Caricamento checkout..." />;
   }
 
   return (
-    <div className="min-h-[70vh] py-10">
+    <div className="min-h-[70vh] py-10 relative">
+      {loading && (
+        <div className="fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center px-4">
+          <LoadingSpinner size="lg" color="teal" />
+          <p className="mt-4 text-slate-700 font-medium">Reindirizzamento a Stripe...</p>
+          <p className="mt-2 text-sm text-slate-500">Attendere, non chiudere questa pagina.</p>
+        </div>
+      )}
+
       <div className="max-w-lg mx-auto px-4">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 text-teal-700 text-sm font-semibold mb-3">
@@ -105,9 +111,10 @@ function CheckoutContent() {
                 if (emailError) setEmailError(false);
               }}
               placeholder="nome@email.it"
+              disabled={loading}
               className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
                 emailError ? "border-red-300 bg-red-50" : "border-slate-200 bg-slate-50"
-              } focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500`}
+              } focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 disabled:opacity-60`}
             />
           </div>
           {emailError && (
@@ -119,9 +126,16 @@ function CheckoutContent() {
             type="button"
             onClick={startCheckout}
             disabled={loading}
-            className="w-full rounded-xl bg-teal-700 py-3.5 text-white font-semibold hover:bg-teal-800 disabled:opacity-60"
+            className="w-full rounded-xl bg-teal-700 py-3.5 text-white font-semibold hover:bg-teal-800 disabled:opacity-60 inline-flex items-center justify-center gap-2"
           >
-            {loading ? "Reindirizzamento a Stripe..." : "Paga con carta"}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Reindirizzamento...
+              </>
+            ) : (
+              "Paga con carta"
+            )}
           </button>
 
           <p className="text-xs text-slate-500 text-center">
@@ -136,13 +150,7 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-[50vh] flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-teal-700" />
-        </div>
-      }
-    >
+    <Suspense fallback={<PageLoader message="Caricamento checkout..." />}>
       <CheckoutContent />
     </Suspense>
   );

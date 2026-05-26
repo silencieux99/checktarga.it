@@ -1,67 +1,78 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
-import { getPlanBySku } from "@/lib/pricing";
-import { addCredits } from "@/lib/credits";
-import { getAdminDb } from "@/lib/firebase-admin";
+import { fulfillPackOrder, resolveOrderIdFromPaymentIntent } from "@/lib/order-fulfillment";
+import { sendTelegramErrorNotification } from "@/lib/telegram-notification-service";
 import Stripe from "stripe";
 
 export const runtime = "nodejs";
 
-const processed = new Set<string>();
+const processedEvents = new Set<string>();
 
-async function fulfillOrder(paymentIntent: Stripe.PaymentIntent) {
-  if (paymentIntent.metadata?.site && paymentIntent.metadata.site !== "checktarga.it") {
+function getWebhookSecrets(): string[] {
+  return [
+    STRIPE_WEBHOOK_SECRET,
+    process.env.STRIPE_WEBHOOK_SECRET_TEST,
+    process.env.STRIPE_WEBHOOK_SECRET_LIVE,
+    process.env.STRIPE_WEBHOOK_SECRET_ALT,
+  ]
+    .filter(Boolean)
+    .flatMap((value) => value!.split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
+  const orderId =
+    paymentIntent.metadata?.orderId || (await resolveOrderIdFromPaymentIntent(paymentIntent.id));
+
+  if (!orderId) {
+    console.warn("[webhook] PaymentIntent senza orderId:", paymentIntent.id);
     return;
   }
 
-  const db = getAdminDb();
-  if (!db) throw new Error("Firestore non configurato");
+  await fulfillPackOrder({
+    orderId,
+    paymentIntentId: paymentIntent.id,
+    source: "webhook",
+  });
+}
 
-  const orderId = paymentIntent.metadata?.orderId;
-  const sku = paymentIntent.metadata?.sku;
-  const customerEmail = paymentIntent.metadata?.customer_email;
-  const customerUid = paymentIntent.metadata?.customerUid;
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+  const paymentIntentId = session.payment_intent as string | null;
+  const orderId = session.metadata?.orderId;
 
-  if (!orderId || !sku || !customerEmail || !customerUid) {
-    console.error("[webhook] metadata mancanti", paymentIntent.metadata);
+  if (orderId) {
+    await fulfillPackOrder({
+      orderId,
+      paymentIntentId: paymentIntentId || undefined,
+      sessionId: session.id,
+      source: "webhook-checkout",
+    });
     return;
   }
 
-  const existing = await db
-    .collection("orders")
-    .where("paymentIntentId", "==", paymentIntent.id)
-    .limit(1)
-    .get();
-
-  if (!existing.empty) {
-    const data = existing.docs[0].data();
-    if (data.status === "COMPLETE") return;
+  if (paymentIntentId) {
+    const resolvedOrderId = await resolveOrderIdFromPaymentIntent(paymentIntentId);
+    if (resolvedOrderId) {
+      await fulfillPackOrder({
+        orderId: resolvedOrderId,
+        paymentIntentId,
+        sessionId: session.id,
+        source: "webhook-checkout",
+      });
+    }
   }
-
-  const plan = getPlanBySku(sku);
-  if (!plan) return;
-
-  await db.collection("orders").doc(orderId).set(
-    {
-      status: "COMPLETE",
-      paymentIntentId: paymentIntent.id,
-      paidAt: Date.now(),
-      updatedAt: Date.now(),
-      creditsAdded: plan.reports,
-      processingLogs: [
-        `[${new Date().toISOString()}] Pagamento Stripe confermato, crediti aggiunti.`,
-      ],
-    },
-    { merge: true }
-  );
-
-  await addCredits(customerUid, plan.reports, plan.sku, "Acquisto Stripe completato");
 }
 
 export async function POST(req: NextRequest) {
   try {
-    if (!stripe || !STRIPE_WEBHOOK_SECRET) {
-      return NextResponse.json({ error: "Webhook non configurato" }, { status: 500 });
+    if (!stripe) {
+      return NextResponse.json({ error: "Stripe non configurato" }, { status: 500 });
+    }
+
+    const secrets = getWebhookSecrets();
+    if (secrets.length === 0) {
+      return NextResponse.json({ error: "Webhook secret mancante" }, { status: 500 });
     }
 
     const body = await req.text();
@@ -70,31 +81,64 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Firma mancante" }, { status: 400 });
     }
 
-    const event = stripe.webhooks.constructEvent(body, signature, STRIPE_WEBHOOK_SECRET);
+    let event: Stripe.Event | undefined;
+    let lastError: unknown = null;
 
-    if (processed.has(event.id)) {
+    for (const secret of secrets) {
+      try {
+        event = stripe.webhooks.constructEvent(body, signature, secret);
+        break;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    if (!event) {
+      console.error("[webhook] Firma non valida:", lastError);
+      return NextResponse.json({ error: "Firma non valida" }, { status: 400 });
+    }
+
+    if (processedEvents.has(event.id)) {
       return NextResponse.json({ received: true });
     }
-    processed.add(event.id);
+    processedEvents.add(event.id);
 
     switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const paymentIntentId = session.payment_intent as string;
-        if (paymentIntentId) {
-          const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-          await fulfillOrder(paymentIntent);
+      case "checkout.session.completed":
+        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        break;
+      case "payment_intent.succeeded":
+        await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent);
+        break;
+      case "payment_intent.payment_failed": {
+        const failedIntent = event.data.object as Stripe.PaymentIntent;
+        const orderId = failedIntent.metadata?.orderId;
+        if (orderId) {
+          const { getAdminDb } = await import("@/lib/firebase-admin");
+          const db = getAdminDb();
+          if (db) {
+            await db.collection("orders").doc(orderId).update({
+              status: "FAILED",
+              updatedAt: Date.now(),
+              processingLogs: [
+                `[${new Date().toISOString()}] Pagamento Stripe fallito (${failedIntent.id})`,
+              ],
+            });
+          }
         }
         break;
       }
-      case "payment_intent.succeeded":
-        await fulfillOrder(event.data.object as Stripe.PaymentIntent);
+      default:
         break;
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("[webhook]", error);
-    return NextResponse.json({ error: "Webhook error" }, { status: 400 });
+    await sendTelegramErrorNotification(
+      error instanceof Error ? error.message : "Errore webhook",
+      "Stripe webhook CheckTarga"
+    );
+    return NextResponse.json({ error: "Webhook error" }, { status: 500 });
   }
 }

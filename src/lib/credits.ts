@@ -33,6 +33,48 @@ export async function getCredits(uid: string): Promise<number> {
   return snap.exists ? snap.data()?.total || 0 : 0;
 }
 
+export async function consumeCredits(
+  uid: string,
+  note: string
+): Promise<{ ok: boolean; remaining: number }> {
+  const db = getAdminDb();
+  if (!db) throw new Error("Firestore non configurato");
+
+  const ref = db.collection("credits").doc(uid);
+  let ok = false;
+  let remaining = 0;
+
+  await db.runTransaction(async (transaction) => {
+    const snap = await transaction.get(ref);
+    const current = snap.exists ? snap.data()?.total || 0 : 0;
+    if (current < 1) {
+      remaining = current;
+      ok = false;
+      return;
+    }
+
+    remaining = current - 1;
+    ok = true;
+    transaction.set(
+      ref,
+      {
+        total: remaining,
+        history: [
+          ...(snap.data()?.history || []),
+          { type: "consume", qty: -1, ts: Date.now(), note },
+        ],
+      },
+      { merge: true }
+    );
+  });
+
+  return { ok, remaining };
+}
+
+export async function refundCredit(uid: string, note: string): Promise<void> {
+  await addCredits(uid, 1, "pack2", note);
+}
+
 import { getAdminAuth } from "./firebase-admin";
 
 export async function ensureGuestUser(email: string): Promise<{

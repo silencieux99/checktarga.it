@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Container from "@/components/Container";
+import { SITE } from "@/lib/pricing";
 
 const COLUMNS = [
   {
@@ -24,7 +25,7 @@ const COLUMNS = [
   {
     title: "Supporto",
     links: [
-      { label: "Contattaci", href: "mailto:assistenza@checktarga.it" },
+      { label: "Contattaci", href: `mailto:${SITE.supportEmail}` },
       { label: "Blog", href: "/blog" },
       { label: "Area personale", href: "/account" },
     ],
@@ -57,10 +58,10 @@ export default function HomeFooter() {
                 dell&apos;acquisto.
               </p>
               <a
-                href="mailto:assistenza@checktarga.it"
+                href={`mailto:${SITE.supportEmail}`}
                 className="mt-4 inline-block text-sm text-blue-400 hover:text-blue-300"
               >
-                assistenza@checktarga.it
+                {SITE.supportEmail}
               </a>
             </div>
 

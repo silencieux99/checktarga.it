@@ -1,3 +1,9 @@
+import {
+  getVehicleByPlate,
+  getVehicleByVIN,
+  type InternationalVehicleData,
+} from "./international-api";
+
 export function formatItalianPlate(raw: string): string {
   const cleaned = raw.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
   if (cleaned.length <= 2) return cleaned;
@@ -27,8 +33,7 @@ export function validateVin(vin: string): string | null {
 }
 
 export function cleanQuery(value: string, type: "plate" | "vin"): string {
-  const cleaned = value.replace(/[\s-]/g, "").toUpperCase();
-  return type === "plate" ? cleaned : cleaned;
+  return value.replace(/[\s-]/g, "").toUpperCase();
 }
 
 export interface VehiclePreview {
@@ -42,73 +47,64 @@ export interface VehiclePreview {
   colore?: string;
   targa?: string;
   vin?: string;
+  error?: string;
 }
 
-export async function lookupVehicle(query: string, type: "plate" | "vin"): Promise<VehiclePreview> {
-  const apiUrl = process.env.VEHICLE_API_URL;
-  const token = process.env.VEHICLE_API_TOKEN;
-
-  if (apiUrl) {
-    try {
-      const url = new URL(apiUrl);
-      url.searchParams.set("query", query);
-      url.searchParams.set("type", type);
-      url.searchParams.set("country", "IT");
-
-      const headers: Record<string, string> = { Accept: "application/json" };
-      if (token) headers.Authorization = `Bearer ${token}`;
-
-      const res = await fetch(url.toString(), { headers, cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.found || data.data) {
-          const v = data.data || data;
-          return {
-            found: true,
-            marca: v.marca || v.make || v.brand,
-            modello: v.modello || v.model,
-            versione: v.versione || v.version,
-            anno: v.anno || v.year,
-            carburante: v.carburante || v.fuel,
-            potenza: v.potenza || v.power,
-            colore: v.colore || v.color,
-            targa: type === "plate" ? query : v.targa,
-            vin: type === "vin" ? query : v.vin,
-          };
-        }
-      }
-    } catch (error) {
-      console.error("[lookupVehicle]", error);
-    }
+function mapToVehiclePreview(
+  data: InternationalVehicleData,
+  query: string,
+  type: "plate" | "vin"
+): VehiclePreview {
+  if (data.erreur) {
+    return {
+      found: false,
+      targa: type === "plate" ? query : data.immat || data.plaque,
+      vin: type === "vin" ? query : data.vin,
+    };
   }
+
+  const year =
+    data.date1erCir_fr?.split("-")[2] ||
+    data.date1erCir_fr?.split("/")[2] ||
+    data.date1erCir_us?.split("-")[0] ||
+    data.debut_modele;
 
   return {
     found: true,
-    marca: type === "vin" ? detectBrandFromVin(query) : undefined,
-    modello: "",
-    versione: "Veicolo identificato",
-    targa: type === "plate" ? query : undefined,
-    vin: type === "vin" ? query : undefined,
+    marca: data.marque,
+    modello: data.modele,
+    versione: data.version || data.modele_en,
+    anno: year,
+    carburante: data.energieNGC || data.energie,
+    potenza: data.puisFiscReelCH || (data.puisFisc ? `${data.puisFisc} CV` : undefined),
+    colore: data.couleur,
+    targa: data.immat || data.plaque || (type === "plate" ? query : undefined),
+    vin: data.vin || data.numero_serie || (type === "vin" ? query : undefined),
   };
 }
 
-function detectBrandFromVin(vin: string): string | undefined {
-  const wmi = vin.slice(0, 3).toUpperCase();
-  const brands: Record<string, string> = {
-    ZFA: "FIAT",
-    ZFF: "FERRARI",
-    ZAM: "MASERATI",
-    ZAR: "ALFA ROMEO",
-    ZLA: "LANCIA",
-    VF3: "PEUGEOT",
-    VF1: "RENAULT",
-    VF7: "CITROËN",
-    WBA: "BMW",
-    WDB: "MERCEDES-BENZ",
-    WVW: "VOLKSWAGEN",
-    WAU: "AUDI",
-    TMB: "ŠKODA",
-    VSS: "SEAT",
-  };
-  return brands[wmi];
+export async function lookupVehicle(
+  query: string,
+  type: "plate" | "vin"
+): Promise<VehiclePreview> {
+  const cleaned = cleanQuery(query, type);
+
+  const data =
+    type === "plate"
+      ? await getVehicleByPlate(cleaned, "IT")
+      : await getVehicleByVIN(cleaned);
+
+  const preview = mapToVehiclePreview(data, cleaned, type);
+
+  if (!preview.found) {
+    return {
+      ...preview,
+      error: data.erreur || "Veicolo non trovato",
+    };
+  }
+
+  return preview;
 }
+
+export type { InternationalVehicleData } from "./international-api";
+export { getVehicleByPlate, getVehicleByVIN } from "./international-api";
