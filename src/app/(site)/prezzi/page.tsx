@@ -23,7 +23,7 @@ export default function PrezziPage() {
           </p>
         </div>
 
-        <PricingCards />
+        <PricingCards ctaMode="hero" />
       </div>
     </div>
   );

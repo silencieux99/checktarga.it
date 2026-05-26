@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 import { rootMetadata, SEO } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
@@ -32,7 +33,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             gtag('config', 'AW-18190010763');
           `}
         </Script>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <AnalyticsTracker />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

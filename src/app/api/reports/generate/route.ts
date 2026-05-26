@@ -4,6 +4,7 @@ import { consumeCredits, getCredits, refundCredit } from "@/lib/credits";
 import { generateVehicleReport } from "@/lib/report-generator";
 import { getVehicleByPlate, getVehicleByVIN } from "@/lib/international-api";
 import { storePdfReport } from "@/lib/blob-storage";
+import { sanitizeForFirestore } from "@/lib/firestore-utils";
 import { validatePlate, validateVin } from "@/lib/vehicle";
 
 export async function POST(request: NextRequest) {
@@ -139,30 +140,35 @@ export async function POST(request: NextRequest) {
 
     const db = getAdminDb();
     if (db) {
-      await db.collection("orders").doc(orderId).set({
-        orderId,
-        customerEmail: email,
-        customerUid: uid,
-        searchType,
-        searchValue: cleaned,
-        status: "COMPLETE",
-        pdfUrl,
-        pdfStoragePath,
-        pdfGenerated: true,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        vehicleInfo: reportResult.vehicleInfo || {},
-        reportData: {
-          sections: reportResult.sections || [],
-          ai: reportResult.ai,
-          rawApiData: reportResult.rawApiData || null,
-        },
-        sections: reportResult.sections || [],
-        rawApiData: reportResult.rawApiData || null,
-        source: "account_credit",
-        country: "IT",
-        site: "checktarga.it",
-      });
+      await db
+        .collection("orders")
+        .doc(orderId)
+        .set(
+          sanitizeForFirestore({
+            orderId,
+            customerEmail: email,
+            customerUid: uid,
+            searchType,
+            searchValue: cleaned,
+            status: "COMPLETE",
+            pdfUrl,
+            pdfStoragePath,
+            pdfGenerated: true,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            vehicleInfo: reportResult.vehicleInfo || {},
+            reportData: {
+              sections: reportResult.sections || [],
+              ai: reportResult.ai,
+              rawApiData: reportResult.rawApiData || null,
+            },
+            sections: reportResult.sections || [],
+            rawApiData: reportResult.rawApiData || null,
+            source: "account_credit",
+            country: "IT",
+            site: "checktarga.it",
+          })
+        );
     }
 
     return NextResponse.json({

@@ -3,6 +3,7 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
 
 let adminApp: App | null = null;
+let firestoreSettingsApplied = false;
 
 function parseServiceAccount(): Record<string, string> | null {
   const inline = process.env.FIREBASE_ADMIN_KEY;
@@ -39,7 +40,15 @@ export function getAdminApp(): App | null {
 
 export function getAdminDb(): Firestore | null {
   const app = getAdminApp();
-  return app ? getFirestore(app) : null;
+  if (!app) return null;
+
+  const db = getFirestore(app);
+  if (!firestoreSettingsApplied) {
+    db.settings({ ignoreUndefinedProperties: true });
+    firestoreSettingsApplied = true;
+  }
+
+  return db;
 }
 
 export function getAdminAuth() {
@@ -54,5 +63,63 @@ export async function verifyFirebaseToken(token: string) {
     return await auth.verifyIdToken(token);
   } catch {
     return null;
+  }
+}
+
+const adminTokenCache = new Map<string, { isAdmin: boolean; expires: number }>();
+
+function getAdminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export async function verifyAdmin(token: string): Promise<boolean> {
+  if (process.env.NODE_ENV === "development" && process.env.DEV_ADMIN_BYPASS === "true") {
+    return true;
+  }
+
+  const cached = adminTokenCache.get(token);
+  if (cached && cached.expires > Date.now()) {
+    return cached.isAdmin;
+  }
+
+  const auth = getAdminAuth();
+  if (!auth) return false;
+
+  try {
+    const decodedToken = await auth.verifyIdToken(token);
+    const userEmail = (decodedToken.email || "").toLowerCase();
+    const isAdmin =
+      decodedToken.admin === true || getAdminEmails().includes(userEmail);
+
+    adminTokenCache.set(token, {
+      isAdmin,
+      expires: Date.now() + 5 * 60 * 1000,
+    });
+
+    if (adminTokenCache.size > 100) {
+      const oldestKey = adminTokenCache.keys().next().value;
+      if (oldestKey) adminTokenCache.delete(oldestKey);
+    }
+
+    return isAdmin;
+  } catch {
+    adminTokenCache.set(token, {
+      isAdmin: false,
+      expires: Date.now() + 60 * 1000,
+    });
+    return false;
+  }
+}
+
+export async function requireAdminToken(token: string | null | undefined) {
+  if (!token) {
+    throw new Error("UNAUTHORIZED");
+  }
+  const isAdmin = await verifyAdmin(token);
+  if (!isAdmin) {
+    throw new Error("FORBIDDEN");
   }
 }

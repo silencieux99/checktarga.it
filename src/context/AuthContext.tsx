@@ -15,8 +15,13 @@ import {
 } from "firebase/auth";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
 
+interface AppUser extends User {
+  admin?: boolean;
+}
+
 interface AuthContextValue {
-  user: User | null;
+  user: AppUser | null;
+  firebaseUser: User | null;
   loading: boolean;
   configured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
@@ -25,8 +30,16 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function getAllowedAdminEmails(): string[] {
+  return (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const configured = isFirebaseConfigured();
 
@@ -36,8 +49,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
-      setUser(nextUser);
+    const unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
+      if (!nextUser) {
+        setUser(null);
+        setFirebaseUser(null);
+        setLoading(false);
+        return;
+      }
+
+      setFirebaseUser(nextUser);
+      const tokenResult = await nextUser.getIdTokenResult();
+      const email = (nextUser.email || "").toLowerCase();
+      const allowedEmails = getAllowedAdminEmails();
+      const appUser: AppUser = {
+        ...nextUser,
+        admin: tokenResult.claims.admin === true || allowedEmails.includes(email),
+      };
+      setUser(appUser);
       setLoading(false);
     });
 
@@ -52,10 +80,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     if (!auth) return;
     await firebaseSignOut(auth);
+    setUser(null);
+    setFirebaseUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, configured, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user, firebaseUser, loading, configured, signIn, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

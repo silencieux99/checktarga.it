@@ -6,12 +6,14 @@ interface PricingCardsProps {
   checkoutBasePath?: string;
   vehicle?: string;
   vehicleType?: string;
+  ctaMode?: "checkout" | "hero";
 }
 
 export default function PricingCards({
   checkoutBasePath = "/checkout",
   vehicle,
   vehicleType,
+  ctaMode = "checkout",
 }: PricingCardsProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -19,6 +21,7 @@ export default function PricingCards({
         const params = new URLSearchParams({ sku: plan.sku });
         if (vehicle) params.set("value", vehicle);
         if (vehicleType) params.set("type", vehicleType);
+        const ctaHref = ctaMode === "hero" ? "/#hero" : `${checkoutBasePath}?${params.toString()}`;
 
         return (
           <div
@@ -62,14 +65,14 @@ export default function PricingCards({
             </ul>
 
             <Link
-              href={`${checkoutBasePath}?${params.toString()}`}
+              href={ctaHref}
               className={`block text-center rounded-xl py-3 font-semibold transition-colors ${
                 plan.highlight
                   ? "bg-teal-700 text-white hover:bg-teal-800"
                   : "bg-slate-900 text-white hover:bg-slate-800"
               }`}
             >
-              Scegli questo pacchetto
+              {ctaMode === "hero" ? "Inizia la verifica" : "Scegli questo pacchetto"}
             </Link>
           </div>
         );

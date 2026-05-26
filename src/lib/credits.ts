@@ -1,4 +1,4 @@
-import { getAdminDb } from "./firebase-admin";
+import { getAdminAuth, getAdminDb } from "./firebase-admin";
 import { PlanSku } from "./pricing";
 
 export async function addCredits(
@@ -75,7 +75,75 @@ export async function refundCredit(uid: string, note: string): Promise<void> {
   await addCredits(uid, 1, "pack2", note);
 }
 
-import { getAdminAuth } from "./firebase-admin";
+export async function adminAdjustCredits(
+  uid: string,
+  delta: number,
+  note: string
+): Promise<{ total: number }> {
+  const db = getAdminDb();
+  if (!db) throw new Error("Firestore non configurato");
+
+  const ref = db.collection("credits").doc(uid);
+  let total = 0;
+
+  await db.runTransaction(async (transaction) => {
+    const snap = await transaction.get(ref);
+    const current = snap.exists ? snap.data()?.total || 0 : 0;
+    total = Math.max(0, current + delta);
+    transaction.set(
+      ref,
+      {
+        total,
+        history: [
+          ...(snap.data()?.history || []),
+          {
+            type: delta >= 0 ? "purchase" : "consume",
+            qty: delta,
+            source: "pack2",
+            ts: Date.now(),
+            note,
+          },
+        ],
+      },
+      { merge: true }
+    );
+  });
+
+  return { total };
+}
+
+export async function adminSetCredits(
+  uid: string,
+  total: number,
+  note: string
+): Promise<{ total: number }> {
+  const db = getAdminDb();
+  if (!db) throw new Error("Firestore non configurato");
+
+  const safeTotal = Math.max(0, Math.floor(total));
+  const ref = db.collection("credits").doc(uid);
+  const snap = await ref.get();
+  const previous = snap.exists ? snap.data()?.total || 0 : 0;
+
+  await ref.set(
+    {
+      total: safeTotal,
+      history: [
+        ...(snap.data()?.history || []),
+        {
+          type: "purchase",
+          qty: safeTotal - previous,
+          source: "pack2",
+          ts: Date.now(),
+          note,
+        },
+      ],
+    },
+    { merge: true }
+  );
+
+  return { total: safeTotal };
+}
 
 export async function ensureGuestUser(email: string): Promise<{
   uid: string;

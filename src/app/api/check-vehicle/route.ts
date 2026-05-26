@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAdminDb } from "@/lib/firebase-admin";
+import { getTodayLocal } from "@/lib/date-range-admin";
 import { cleanQuery, lookupVehicle } from "@/lib/vehicle";
 
 export const runtime = "nodejs";
@@ -8,6 +10,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const query = searchParams.get("query") || "";
     const type = (searchParams.get("type") || "plate") as "plate" | "vin";
+    const sessionId = searchParams.get("sessionId") || "unknown";
 
     if (!query) {
       return NextResponse.json({ error: "QUERY_REQUIRED" }, { status: 400 });
@@ -15,6 +18,23 @@ export async function GET(req: NextRequest) {
 
     const cleaned = cleanQuery(query, type);
     const data = await lookupVehicle(cleaned, type);
+
+    try {
+      const db = getAdminDb();
+      if (db) {
+        await db.collection("vehicle_searches").add({
+          query: cleaned,
+          type,
+          found: Boolean(data.found),
+          sessionId,
+          siteId: "checktarga.it",
+          day: getTodayLocal(),
+          ts: Date.now(),
+        });
+      }
+    } catch (logError) {
+      console.warn("[check-vehicle] search log failed", logError);
+    }
 
     if (!data.found) {
       return NextResponse.json(

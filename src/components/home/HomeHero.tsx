@@ -39,7 +39,7 @@ export default function HomeHero() {
   };
 
   return (
-    <section className="relative bg-white pb-12 pt-6 sm:pb-16 sm:pt-8 lg:pb-24 lg:pt-16">
+    <section id="hero" className="relative scroll-mt-20 bg-white pb-12 pt-6 sm:pb-16 sm:pt-8 lg:pb-24 lg:pt-16">
       <Container className="px-3 sm:px-4">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-6 flex flex-col items-center justify-center gap-3">
