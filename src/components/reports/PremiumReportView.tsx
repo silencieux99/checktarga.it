@@ -400,7 +400,7 @@ export default function PremiumReportView({
                             <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
                                 <div className="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-[10px] md:text-sm font-bold text-slate-900 shadow-lg flex items-center gap-2">
                                     <span className="w-2 h-2 bg-teal-600 rounded-full animate-pulse" />
-                                    Foto modello (API)
+                                    Foto modello
                                 </div>
                             </div>
                         </div>
@@ -460,7 +460,9 @@ export default function PremiumReportView({
 
             <div className="max-w-5xl mx-auto px-4 pb-32 lg:pb-24">
                 <div className="space-y-6">
-                    {sections.map((section) => (
+                    {sections
+                        .filter((section) => section.id !== "media")
+                        .map((section) => (
                         <SectionCard key={section.id || section.title} section={section} />
                     ))}
                 </div>

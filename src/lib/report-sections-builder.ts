@@ -230,17 +230,6 @@ export function buildReportSections(
     });
   }
 
-  if (hasApiValue(vehicle.logo_marque) || hasApiValue(vehicle.photo_modele)) {
-    sections.unshift({
-      id: "media",
-      title: "Media veicolo",
-      items: [
-        item("Logo marca", vehicle.logo_marque),
-        item("Foto modello", vehicle.photo_modele),
-      ],
-    });
-  }
-
   return sections;
 }
 

@@ -103,6 +103,8 @@ export async function generateProfessionalPDF(options: PDFGeneratorOptions): Pro
 
   currentY += 25;
 
+  const reportSections = options.sections.filter((section) => section.id !== "media");
+
   checkPageBreak(30);
   doc.setFontSize(14);
   setColor(colors.text);
@@ -111,7 +113,7 @@ export async function generateProfessionalPDF(options: PDFGeneratorOptions): Pro
   currentY += 10;
 
   let score = 100;
-  options.sections.forEach((section) => {
+  reportSections.forEach((section) => {
     section.items.forEach((item) => {
       if (item.flag === "risk") score -= 15;
       if (item.flag === "warn") score -= 5;
@@ -135,7 +137,7 @@ export async function generateProfessionalPDF(options: PDFGeneratorOptions): Pro
   let ok = 0;
   let warnings = 0;
   let risks = 0;
-  options.sections.forEach((section) => {
+  reportSections.forEach((section) => {
     section.items.forEach((item) => {
       total++;
       if (item.flag === "ok") ok++;
@@ -181,7 +183,7 @@ export async function generateProfessionalPDF(options: PDFGeneratorOptions): Pro
     currentY += 20;
   }
 
-  options.sections.forEach((section, sectionIndex) => {
+  reportSections.forEach((section, sectionIndex) => {
     checkPageBreak(20);
     doc.setFontSize(12);
     setColor(colors.primary);
