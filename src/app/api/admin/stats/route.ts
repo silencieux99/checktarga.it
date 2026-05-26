@@ -11,6 +11,10 @@ import {
 } from "@/lib/date-range-admin";
 
 import {
+  firestoreApiErrorResponse,
+  isFirestoreIndexError,
+} from "@/lib/firestore-index-error";
+import {
   getAdminStatsCache,
   setAdminStatsCache,
 } from "@/lib/admin-stats-cache";
@@ -39,6 +43,7 @@ async function countVisitsForDay(db: Firestore, dayStr: string) {
   const snap = await db
     .collection("analytics_visits")
     .where("day", "==", dayStr)
+    .orderBy("ts", "asc")
     .limit(MAX_VISITS)
     .get();
 
@@ -194,8 +199,11 @@ export async function GET(req: NextRequest) {
       });
       totalSearches = uniqueSearchSessions.size;
       totalHits = uniqueHitSessions.size;
-    } catch {
-      // collection may not exist yet
+    } catch (searchError) {
+      if (isFirestoreIndexError(searchError)) {
+        throw searchError;
+      }
+      console.warn("[admin/stats] vehicle_searches unavailable", searchError);
     }
 
     const payload = {
@@ -223,7 +231,6 @@ export async function GET(req: NextRequest) {
     setAdminStatsCache(cacheKey, payload);
     return NextResponse.json(payload);
   } catch (error) {
-    console.error("[admin/stats]", error);
-    return NextResponse.json({ error: "Errore interno" }, { status: 500 });
+    return firestoreApiErrorResponse(error, "[admin/stats]");
   }
 }

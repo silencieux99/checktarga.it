@@ -3,6 +3,16 @@
 import { useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 
+export class AdminApiError extends Error {
+  indexUrl?: string;
+
+  constructor(message: string, indexUrl?: string) {
+    super(message);
+    this.name = "AdminApiError";
+    this.indexUrl = indexUrl;
+  }
+}
+
 export function useAdminFetch() {
   const { firebaseUser } = useAuth();
 
@@ -24,6 +34,17 @@ export function useAdminFetch() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
+        if (data.error === "Firestore index required") {
+          if (data.indexUrl) {
+            console.error("Firestore index required:", data.indexUrl);
+          } else if (data.message) {
+            console.error("Firestore index required:", data.message);
+          }
+          throw new AdminApiError(
+            data.details || data.message || "Indice Firestore richiesto",
+            data.indexUrl
+          );
+        }
         throw new Error(data.error || `Errore API (${res.status})`);
       }
       return data;

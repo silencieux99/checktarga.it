@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import KpiCard from "@/components/admin/KpiCard";
-import { useAdminFetch } from "@/hooks/useAdminFetch";
+import { useAdminFetch, AdminApiError } from "@/hooks/useAdminFetch";
 import { ADMIN_DATA_CHANGED, readAdminDataVersion } from "@/lib/admin-sync";
 import { formatPrice } from "@/lib/pricing";
 
@@ -49,6 +49,7 @@ export default function AdminDashboardPage() {
   const [recentOrders, setRecentOrders] = useState<OrdersResponse["orders"]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [indexUrl, setIndexUrl] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
 
   const loadDashboard = useCallback(async () => {
@@ -56,6 +57,7 @@ export default function AdminDashboardPage() {
 
     setLoading(true);
     setError(null);
+    setIndexUrl(null);
     try {
       const bust = Date.now();
       const statsData = (await fetchAdmin(
@@ -67,7 +69,12 @@ export default function AdminDashboardPage() {
       setStats(statsData);
       setRecentOrders(ordersData.orders || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Errore di caricamento");
+      if (err instanceof AdminApiError) {
+        setError(err.message);
+        setIndexUrl(err.indexUrl || null);
+      } else {
+        setError(err instanceof Error ? err.message : "Errore di caricamento");
+      }
     } finally {
       setLoading(false);
     }
@@ -149,7 +156,17 @@ export default function AdminDashboardPage() {
 
       {error ? (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-300">
-          {error}
+          <p>{error}</p>
+          {indexUrl ? (
+            <a
+              href={indexUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block text-sm font-medium text-red-200 underline hover:text-white"
+            >
+              Crea l&apos;indice Firestore
+            </a>
+          ) : null}
         </div>
       ) : null}
 

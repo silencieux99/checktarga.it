@@ -29,6 +29,7 @@ export function useUserReports() {
   const [reports, setReports] = useState<UserReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [indexUrl, setIndexUrl] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState(0);
 
   const fetchReports = useCallback(
@@ -46,15 +47,30 @@ export function useUserReports() {
       try {
         setLoading(true);
         setError(null);
+        setIndexUrl(null);
         const token = await user.getIdToken();
         const response = await fetch("/api/user-reports", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!response.ok) throw new Error("Impossibile caricare i report");
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          if (data.error === "Firestore index required") {
+            if (data.indexUrl) {
+              console.error("Firestore index required:", data.indexUrl);
+              setIndexUrl(data.indexUrl);
+            } else if (data.message) {
+              console.error("Firestore index required:", data.message);
+            }
+            throw new Error(
+              data.details || "Indice Firestore richiesto per caricare i report."
+            );
+          }
+          throw new Error(data.error || "Impossibile caricare i report");
+        }
 
-        const data: UserReportsResponse = await response.json();
-        setReports(data.reports || []);
+        const reportsData = data as UserReportsResponse;
+        setReports(reportsData.reports || []);
         setLastFetch(now);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Errore sconosciuto");
@@ -115,5 +131,6 @@ export function useUserReports() {
     downloadReport,
     getReportDisplayName,
     total: reports.length,
+    indexUrl,
   };
 }

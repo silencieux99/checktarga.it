@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminRequest } from "@/lib/admin-request";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { firestoreApiErrorResponse } from "@/lib/firestore-index-error";
 
 export const runtime = "nodejs";
 
@@ -35,7 +36,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, reports });
   } catch (error) {
-    console.error("[admin/reports]", error);
-    return NextResponse.json({ error: "Errore interno" }, { status: 500 });
+    return firestoreApiErrorResponse(error, "[admin/reports]");
   }
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SiteAuthActions from "@/components/SiteAuthActions";
 import { SITE } from "@/lib/pricing";
 
 export default function Header() {
@@ -22,21 +23,13 @@ export default function Header() {
           <Link href="/prezzi" className="hover:text-blue-600">
             Prezzi
           </Link>
-          <Link href="/login" className="hover:text-blue-600">
-            Accedi
-          </Link>
-          <Link href="/account" className="hover:text-blue-600">
-            Il mio account
-          </Link>
+          <SiteAuthActions variant="site-nav" />
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-blue-600 md:hidden">
-            Accedi
-          </Link>
-          <Link href="/account" className="text-sm font-medium text-slate-600 hover:text-blue-600 md:hidden">
-            Account
-          </Link>
+          <div className="flex items-center gap-2 md:hidden">
+            <SiteAuthActions variant="site-mobile" />
+          </div>
           <Link
             href="/prezzi"
             className="inline-flex items-center rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors sm:px-4"

@@ -3,7 +3,7 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
 
 let adminApp: App | null = null;
-let firestoreSettingsApplied = false;
+let adminDb: Firestore | null = null;
 
 function parseServiceAccount(): Record<string, string> | null {
   const inline = process.env.FIREBASE_ADMIN_KEY;
@@ -41,14 +41,17 @@ export function getAdminApp(): App | null {
 export function getAdminDb(): Firestore | null {
   const app = getAdminApp();
   if (!app) return null;
+  if (adminDb) return adminDb;
 
-  const db = getFirestore(app);
-  if (!firestoreSettingsApplied) {
-    db.settings({ ignoreUndefinedProperties: true });
-    firestoreSettingsApplied = true;
+  adminDb = getFirestore(app);
+  try {
+    adminDb.settings({ ignoreUndefinedProperties: true });
+  } catch (error) {
+    // Firestore may already be initialized (e.g. Next.js HMR or prior getFirestore use).
+    console.warn("[firebase-admin] Firestore settings skipped:", error);
   }
 
-  return db;
+  return adminDb;
 }
 
 export function getAdminAuth() {

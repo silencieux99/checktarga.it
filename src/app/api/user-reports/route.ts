@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyFirebaseToken, getAdminDb } from "@/lib/firebase-admin";
 import { resolveBlobDownloadUrl } from "@/lib/blob-storage";
+import {
+  firestoreApiErrorResponse,
+  getFirestoreIndexErrorPayload,
+  isFirestoreIndexError,
+} from "@/lib/firestore-index-error";
 
 export interface UserReport {
   id: string;
@@ -86,13 +91,10 @@ export async function GET(request: NextRequest) {
       userEmail,
     });
   } catch (error) {
-    console.error("[UserReports] Errore:", error);
-    return NextResponse.json(
-      {
-        error: "Errore interno",
-        message: error instanceof Error ? error.message : "Errore sconosciuto",
-      },
-      { status: 500 }
-    );
+    if (isFirestoreIndexError(error)) {
+      console.error("[UserReports] Firestore index required:", error);
+      return NextResponse.json(getFirestoreIndexErrorPayload(error), { status: 400 });
+    }
+    return firestoreApiErrorResponse(error, "[UserReports]");
   }
 }

@@ -21,6 +21,7 @@ export default function ReportsList() {
     reports,
     loading,
     error,
+    indexUrl,
     fetchReports,
     downloadReport,
     getReportDisplayName,
@@ -63,7 +64,17 @@ export default function ReportsList() {
   if (error) {
     return (
       <div className="text-center py-10">
-        <p className="text-slate-600 mb-4">{ACCOUNT_UI.accountErrorLoading}</p>
+        <p className="text-slate-600 mb-4">{error}</p>
+        {indexUrl ? (
+          <a
+            href={indexUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-4 inline-block text-sm font-semibold text-blue-600 hover:text-blue-700 underline"
+          >
+            Crea l&apos;indice Firestore
+          </a>
+        ) : null}
         <button
           type="button"
           onClick={() => fetchReports(true)}
