@@ -5,6 +5,11 @@ import { getFirestore, Firestore } from "firebase-admin/firestore";
 let adminApp: App | null = null;
 let adminDb: Firestore | null = null;
 
+const globalStore = globalThis as typeof globalThis & {
+  __checktargaAdminDb?: Firestore;
+  __checktargaFirestoreSettingsApplied?: boolean;
+};
+
 function parseServiceAccount(): Record<string, string> | null {
   const inline = process.env.FIREBASE_ADMIN_KEY;
   if (inline) {
@@ -41,14 +46,25 @@ export function getAdminApp(): App | null {
 export function getAdminDb(): Firestore | null {
   const app = getAdminApp();
   if (!app) return null;
+
+  if (globalStore.__checktargaAdminDb) {
+    adminDb = globalStore.__checktargaAdminDb;
+    return adminDb;
+  }
+
   if (adminDb) return adminDb;
 
   adminDb = getFirestore(app);
-  try {
-    adminDb.settings({ ignoreUndefinedProperties: true });
-  } catch (error) {
-    // Firestore may already be initialized (e.g. Next.js HMR or prior getFirestore use).
-    console.warn("[firebase-admin] Firestore settings skipped:", error);
+  globalStore.__checktargaAdminDb = adminDb;
+
+  if (!globalStore.__checktargaFirestoreSettingsApplied) {
+    try {
+      adminDb.settings({ ignoreUndefinedProperties: true });
+    } catch {
+      // Firestore may already be initialized during Next.js HMR.
+    } finally {
+      globalStore.__checktargaFirestoreSettingsApplied = true;
+    }
   }
 
   return adminDb;

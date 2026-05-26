@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import KpiCard from "@/components/admin/KpiCard";
-import LiveVisitsFeed from "@/components/admin/LiveVisitsFeed";
 import RealtimeVisitors from "@/components/admin/RealtimeVisitors";
 import { useAdminFetch, AdminApiError } from "@/hooks/useAdminFetch";
 import { useLivePresence } from "@/hooks/useLivePresence";
@@ -56,7 +55,6 @@ export default function AdminDashboardPage() {
   const [refreshToken, setRefreshToken] = useState(0);
   const {
     presence,
-    recentVisits,
     totalOnline,
     loading: liveLoading,
     updatedAt: liveUpdatedAt,
@@ -212,14 +210,11 @@ export default function AdminDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <RealtimeVisitors
-          pages={presence.pages}
-          totalOnline={totalOnline}
-          loading={liveLoading}
-        />
-        <LiveVisitsFeed visits={recentVisits} loading={liveLoading} />
-      </div>
+      <RealtimeVisitors
+        pages={presence.pages}
+        totalOnline={totalOnline}
+        loading={liveLoading}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border border-white/10 bg-[#111111] p-6">

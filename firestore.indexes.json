@@ -9,14 +9,6 @@
       ]
     },
     {
-      "collectionGroup": "analytics_visits",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "day", "order": "ASCENDING" },
-        { "fieldPath": "ts", "order": "DESCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "analytics_presence",
       "queryScope": "COLLECTION",
       "fields": [

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 const SESSION_KEY = "ct_session_id";
+const VISIT_LOGGED_KEY = "ct_visit_logged";
 const TRAFFIC_SOURCE_KEY = "ct_traffic_source";
 
 function getSessionId() {
@@ -22,6 +23,21 @@ function getSessionId() {
   }
 }
 
+function sendHeartbeat(sessionId: string, path: string) {
+  fetch("/api/analytics/heartbeat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId,
+      ts: Date.now(),
+      ua: navigator.userAgent,
+      path,
+      country: "IT",
+    }),
+    keepalive: true,
+  }).catch(() => {});
+}
+
 export default function AnalyticsTracker() {
   const pathname = usePathname();
   const lastPathRef = useRef<string | null>(null);
@@ -35,6 +51,44 @@ export default function AnalyticsTracker() {
     const path = window.location.pathname + window.location.search;
     if (lastPathRef.current === path) return;
     lastPathRef.current = path;
+
+    sendHeartbeat(sessionId, path);
+
+    let alreadyLogged = false;
+    try {
+      alreadyLogged = sessionStorage.getItem(VISIT_LOGGED_KEY) === "1";
+    } catch {
+      alreadyLogged = false;
+    }
+
+    if (alreadyLogged) {
+      const interval = window.setInterval(() => {
+        sendHeartbeat(sessionId, window.location.pathname + window.location.search);
+      }, 15_000);
+
+      return () => {
+        window.clearInterval(interval);
+        try {
+          navigator.sendBeacon?.(
+            "/api/analytics/heartbeat",
+            new Blob(
+              [
+                JSON.stringify({
+                  sessionId,
+                  ts: Date.now(),
+                  ua: navigator.userAgent,
+                  path: window.location.pathname + window.location.search,
+                  country: "IT",
+                }),
+              ],
+              { type: "application/json" }
+            )
+          );
+        } catch {
+          // ignore
+        }
+      };
+    }
 
     let isDoubleClick = false;
     let currentGclid: string | null = null;
@@ -87,23 +141,14 @@ export default function AnalyticsTracker() {
         if (data?.trafficSource) {
           sessionStorage.setItem(TRAFFIC_SOURCE_KEY, data.trafficSource);
         }
+        if (data?.ok) {
+          sessionStorage.setItem(VISIT_LOGGED_KEY, "1");
+        }
       })
       .catch(() => {});
 
     const interval = window.setInterval(() => {
-      const currentPath = window.location.pathname + window.location.search;
-      fetch("/api/analytics/heartbeat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId,
-          ts: Date.now(),
-          ua: navigator.userAgent,
-          path: currentPath,
-          country: "IT",
-        }),
-        keepalive: true,
-      }).catch(() => {});
+      sendHeartbeat(sessionId, window.location.pathname + window.location.search);
     }, 15_000);
 
     return () => {

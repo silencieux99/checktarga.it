@@ -19,15 +19,6 @@ export interface LivePresenceSnapshot {
   sessions: LiveVisitorSession[];
 }
 
-export interface RecentVisitEvent {
-  id: string;
-  path: string;
-  ts: number;
-  sessionId?: string;
-  country?: string;
-  trafficSource?: string;
-}
-
 function isChecktargaSite(siteId: unknown) {
   return !siteId || siteId === "checktarga.it";
 }
@@ -120,13 +111,4 @@ export function getPageLabel(path: string) {
   if (basePath.startsWith("/informe/")) return "Report veicolo";
   if (basePath.startsWith("/admin")) return "Admin";
   return basePath;
-}
-
-export function formatTimeAgo(ts: number, now = Date.now()) {
-  const seconds = Math.max(0, Math.floor((now - ts) / 1000));
-  if (seconds < 5) return "adesso";
-  if (seconds < 60) return `${seconds}s fa`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} min fa`;
-  return `${Math.floor(minutes / 60)} h fa`;
 }

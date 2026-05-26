@@ -2,16 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAdminFetch } from "@/hooks/useAdminFetch";
-import type { LivePresenceSnapshot, RecentVisitEvent } from "@/lib/admin-presence";
+import type { LivePresenceSnapshot } from "@/lib/admin-presence";
 
 interface LivePresenceResponse extends LivePresenceSnapshot {
   success: boolean;
-  updatedAt: number;
-}
-
-interface RecentVisitsResponse {
-  success: boolean;
-  visits: RecentVisitEvent[];
   updatedAt: number;
 }
 
@@ -24,7 +18,6 @@ const EMPTY_PRESENCE: LivePresenceSnapshot = {
 export function useLivePresence(pollIntervalMs = 10_000) {
   const { adminRequest, firebaseUser } = useAdminFetch();
   const [presence, setPresence] = useState<LivePresenceSnapshot>(EMPTY_PRESENCE);
-  const [recentVisits, setRecentVisits] = useState<RecentVisitEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<number | null>(null);
 
@@ -32,18 +25,13 @@ export function useLivePresence(pollIntervalMs = 10_000) {
     if (!firebaseUser) return;
 
     try {
-      const [presenceData, visitsData] = await Promise.all([
-        adminRequest("/api/admin/presence") as Promise<LivePresenceResponse>,
-        adminRequest("/api/admin/visits/recent?limit=25") as Promise<RecentVisitsResponse>,
-      ]);
-
+      const presenceData = (await adminRequest("/api/admin/presence")) as LivePresenceResponse;
       setPresence({
         totalOnline: presenceData.totalOnline,
         pages: presenceData.pages || [],
         sessions: presenceData.sessions || [],
       });
-      setRecentVisits(visitsData.visits || []);
-      setUpdatedAt(Math.max(presenceData.updatedAt || 0, visitsData.updatedAt || 0));
+      setUpdatedAt(presenceData.updatedAt || Date.now());
     } catch {
       // Keep last known values during transient errors.
     } finally {
@@ -64,7 +52,6 @@ export function useLivePresence(pollIntervalMs = 10_000) {
 
   return {
     presence,
-    recentVisits,
     totalOnline: presence.totalOnline,
     loading,
     updatedAt,
