@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import KpiCard from "@/components/admin/KpiCard";
+import LiveVisitsFeed from "@/components/admin/LiveVisitsFeed";
+import RealtimeVisitors from "@/components/admin/RealtimeVisitors";
 import { useAdminFetch, AdminApiError } from "@/hooks/useAdminFetch";
+import { useLivePresence } from "@/hooks/useLivePresence";
 import { ADMIN_DATA_CHANGED, readAdminDataVersion } from "@/lib/admin-sync";
 import { formatPrice } from "@/lib/pricing";
 
@@ -51,6 +54,13 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [indexUrl, setIndexUrl] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
+  const {
+    presence,
+    recentVisits,
+    totalOnline,
+    loading: liveLoading,
+    updatedAt: liveUpdatedAt,
+  } = useLivePresence(10_000);
 
   const loadDashboard = useCallback(async () => {
     if (!firebaseUser) return;
@@ -170,16 +180,25 @@ export default function AdminDashboardPage() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         <KpiCard
           label="Fatturato"
           value={loading || !stats ? "..." : formatPrice(stats.revenue)}
           hint={`${stats?.paid ?? 0} ordini pagati`}
         />
         <KpiCard
+          label="Online adesso"
+          value={liveLoading ? "..." : String(totalOnline)}
+          hint={
+            liveUpdatedAt
+              ? `Live ${new Date(liveUpdatedAt).toLocaleTimeString("it-IT")}`
+              : "Aggiornamento ogni 10s"
+          }
+        />
+        <KpiCard
           label="Visite uniche"
           value={loading || !stats ? "..." : String(stats.visits)}
-          hint={`${stats?.online ?? 0} online adesso`}
+          hint="Nel periodo selezionato"
         />
         <KpiCard
           label="Ricerche veicolo"
@@ -191,6 +210,15 @@ export default function AdminDashboardPage() {
           value={loading || !stats ? "..." : String(stats.total)}
           hint={`${stats?.failed ?? 0} falliti`}
         />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RealtimeVisitors
+          pages={presence.pages}
+          totalOnline={totalOnline}
+          loading={liveLoading}
+        />
+        <LiveVisitsFeed visits={recentVisits} loading={liveLoading} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

@@ -15,6 +15,10 @@ import {
   isFirestoreIndexError,
 } from "@/lib/firestore-index-error";
 import {
+  aggregateLivePresence,
+  PRESENCE_TIMEOUT_MS,
+} from "@/lib/admin-presence";
+import {
   getAdminStatsCache,
   setAdminStatsCache,
 } from "@/lib/admin-stats-cache";
@@ -170,13 +174,13 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => a.t - b.t);
 
     const now = Date.now();
-    let online = 0;
-    const presenceSnap = await db.collection("analytics_presence").limit(2000).get();
-    presenceSnap.forEach((doc) => {
-      const data = doc.data();
-      if (data.siteId && data.siteId !== "checktarga.it") return;
-      if (data.lastActive && now - Number(data.lastActive) < 60_000) online += 1;
-    });
+    const presenceThreshold = now - PRESENCE_TIMEOUT_MS;
+    const presenceSnap = await db
+      .collection("analytics_presence")
+      .where("lastActive", ">=", presenceThreshold)
+      .limit(500)
+      .get();
+    const online = aggregateLivePresence(presenceSnap.docs, now).totalOnline;
 
     let totalSearches = 0;
     let totalHits = 0;

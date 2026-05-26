@@ -104,7 +104,7 @@ export default function AnalyticsTracker() {
         }),
         keepalive: true,
       }).catch(() => {});
-    }, 30_000);
+    }, 15_000);
 
     return () => {
       window.clearInterval(interval);

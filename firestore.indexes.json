@@ -13,7 +13,14 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "day", "order": "ASCENDING" },
-        { "fieldPath": "sessionId", "order": "ASCENDING" }
+        { "fieldPath": "ts", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "analytics_presence",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "lastActive", "order": "ASCENDING" }
       ]
     },
     {
