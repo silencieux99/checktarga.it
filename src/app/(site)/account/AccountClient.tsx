@@ -1,11 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Car,
+  CheckCircle2,
   CreditCard,
+  Eye,
   FileText,
   Loader2,
   Mail,
@@ -17,6 +19,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ReportsList from "@/components/account/ReportsList";
 import { useAuth } from "@/context/AuthContext";
 import { useCredits } from "@/hooks/useCredits";
+import { ACCOUNT_UI } from "@/lib/account-ui-text";
 import { SITE } from "@/lib/pricing";
 import { formatItalianPlate, validatePlate, validateVin } from "@/lib/vehicle";
 
@@ -32,8 +35,7 @@ export default function AccountClient() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
-  const [generatedPdfUrl, setGeneratedPdfUrl] = useState<string | null>(null);
-  const [reportsRefreshKey, setReportsRefreshKey] = useState(0);
+  const [generatedOrderId, setGeneratedOrderId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -48,12 +50,11 @@ export default function AccountClient() {
     setGenerateError(null);
     setShowTerminal(false);
     setTerminalLogs([]);
-    setGeneratedPdfUrl(null);
+    setGeneratedOrderId(null);
     setIsGenerating(false);
   };
 
-  const handleGenerate = async (event: FormEvent) => {
-    event.preventDefault();
+  const handleGenerateReport = async () => {
     const value = searchValue.trim();
     const error =
       searchType === "plate" ? validatePlate(value) : validateVin(value.replace(/\s/g, ""));
@@ -70,18 +71,19 @@ export default function AccountClient() {
     setGenerateError(null);
     setShowTerminal(true);
     setTerminalLogs([]);
-    setGeneratedPdfUrl(null);
+    setGeneratedOrderId(null);
 
     const cleaned = value.replace(/[\s-]/g, "").toUpperCase();
 
     try {
-      setTerminalLogs((prev) => [...prev, "> Avvio generazione report..."]);
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountGenerationStarting]);
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      setTerminalLogs((prev) => [...prev, "> Verifica crediti disponibili..."]);
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountCheckingCredits]);
       await new Promise((resolve) => setTimeout(resolve, 300));
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountCreditDeducted]);
 
-      setTerminalLogs((prev) => [...prev, "> Ricerca dati veicolo (Italia)..."]);
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountCallingAPI]);
 
       const token = await user.getIdToken();
       const response = await fetch("/api/reports/generate", {
@@ -102,26 +104,29 @@ export default function AccountClient() {
         throw new Error(data.message || data.error || "Errore durante la generazione");
       }
 
-      setTerminalLogs((prev) => [...prev, "> Dati veicolo recuperati"]);
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountAPISuccess]);
       await new Promise((resolve) => setTimeout(resolve, 400));
 
-      setTerminalLogs((prev) => [...prev, "> Analisi e generazione PDF..."]);
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountAnalyzing]);
       await new Promise((resolve) => setTimeout(resolve, 500));
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountAnalysisComplete]);
 
-      setTerminalLogs((prev) => [...prev, "> PDF salvato su cloud"]);
-      setTerminalLogs((prev) => [...prev, "> Report pronto!"]);
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountGeneratingPDF]);
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountPDFGenerated]);
 
-      if (data.pdfUrl) {
-        setGeneratedPdfUrl(data.pdfUrl);
+      setTerminalLogs((prev) => [...prev, ACCOUNT_UI.accountReportSuccess]);
+
+      if (data.orderId) {
+        setGeneratedOrderId(data.orderId);
         await refreshCredits();
-        setReportsRefreshKey((key) => key + 1);
       } else {
-        throw new Error("URL PDF non disponibile");
+        throw new Error("ID report non disponibile");
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore imprevisto";
       setGenerateError(message);
-      setTerminalLogs((prev) => [...prev, `> ERRORE: ${message}`]);
+      setTerminalLogs((prev) => [...prev, `❌ ${message}`]);
     } finally {
       setIsGenerating(false);
     }
@@ -265,7 +270,7 @@ export default function AccountClient() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-slate-900">I miei report</h2>
+            <h2 className="text-xl font-semibold text-slate-900">{ACCOUNT_UI.accountMyReports}</h2>
             <button
               type="button"
               onClick={() => setShowGenerateModal(true)}
@@ -273,29 +278,26 @@ export default function AccountClient() {
               className="hidden sm:inline-flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:opacity-50"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Nuovo report
+              {ACCOUNT_UI.accountNewReport}
             </button>
           </div>
-          <ReportsList refreshKey={reportsRefreshKey} />
+          <ReportsList />
         </div>
       </div>
 
       {showGenerateModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div
-            className="absolute inset-0"
-            onClick={resetGenerateModal}
-          />
+        <div className="fixed inset-0 bg-black/50 z-50">
+          <div className="absolute inset-0" onClick={resetGenerateModal} />
 
-          <div className="relative w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl">
-            <div className="flex justify-center pt-3 pb-2 sm:hidden">
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl max-h-[90vh] flex flex-col sm:max-w-lg sm:mx-auto sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-2xl">
+            <div className="flex justify-center pt-3 pb-2">
               <div className="w-12 h-1 bg-slate-300 rounded-full" />
             </div>
 
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Nuovo report</h3>
-                <p className="text-sm text-slate-500">Cerca per targa o VIN</p>
+                <h3 className="text-lg font-semibold text-slate-900">{ACCOUNT_UI.accountNewReport}</h3>
+                <p className="text-sm text-slate-500">{ACCOUNT_UI.accountSearchVehicle}</p>
               </div>
               <button
                 type="button"
@@ -306,104 +308,56 @@ export default function AccountClient() {
               </button>
             </div>
 
-            {showTerminal ? (
-              <div className="px-6 py-5 space-y-4">
-                <div className="rounded-xl bg-slate-900 p-4 font-mono text-xs text-green-400 min-h-[180px] max-h-[240px] overflow-y-auto">
-                  {terminalLogs.map((log, index) => (
-                    <div key={index} className="leading-relaxed">
-                      {log}
+            <div className="px-6 py-4 space-y-5 overflow-y-auto flex-1">
+              {showTerminal && (
+                <div className="bg-slate-900 rounded-lg p-4 font-mono text-sm">
+                  <div className="flex items-center mb-3">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full" />
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full" />
+                      <div className="w-3 h-3 bg-green-500 rounded-full" />
                     </div>
-                  ))}
-                  {isGenerating && (
-                    <div className="flex items-center gap-2 mt-2 text-slate-400">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      In corso...
-                    </div>
-                  )}
-                </div>
-
-                {generateError && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
-                    {generateError}
+                    <span className="text-slate-400 ml-3">Terminal</span>
                   </div>
-                )}
+                  <div className="space-y-1">
+                    {terminalLogs.map((log, index) => (
+                      <div key={index} className="text-green-400">
+                        <span className="text-slate-500">$</span> {log}
+                      </div>
+                    ))}
+                    {isGenerating && (
+                      <div className="text-green-400">
+                        <span className="text-slate-500">$</span>{" "}
+                        <span className="animate-pulse">▋</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
-                {generatedPdfUrl && !isGenerating && (
-                  <a
-                    href={generatedPdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium"
-                  >
-                    <FileText className="h-4 w-4" />
-                    Scarica il report PDF
-                  </a>
-                )}
-
-                <button
-                  type="button"
-                  onClick={resetGenerateModal}
-                  className="w-full py-3 rounded-lg border border-slate-300 text-slate-700"
-                >
-                  {generatedPdfUrl ? "Chiudi" : "Annulla"}
-                </button>
-              </div>
-            ) : (
-            <form onSubmit={handleGenerate} className="px-6 py-5 space-y-5">
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchType("plate");
-                    setSearchValue("");
-                    setGenerateError(null);
-                  }}
-                  className={`flex-1 py-3 px-4 rounded-lg border-2 text-sm font-medium ${
-                    searchType === "plate"
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-slate-200 text-slate-600"
-                  }`}
-                >
-                  Targa
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchType("vin");
-                    setSearchValue("");
-                    setGenerateError(null);
-                  }}
-                  className={`flex-1 py-3 px-4 rounded-lg border-2 text-sm font-medium ${
-                    searchType === "vin"
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-slate-200 text-slate-600"
-                  }`}
-                >
-                  VIN
-                </button>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-900 mb-2">
-                  {searchType === "plate" ? "Targa italiana" : "Numero di telaio (VIN)"}
-                </label>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={searchValue}
-                  onChange={(event) => {
-                    const value =
-                      searchType === "plate"
-                        ? formatItalianPlate(event.target.value)
-                        : event.target.value.toUpperCase();
-                    setSearchValue(value);
-                    if (generateError) setGenerateError(null);
-                  }}
-                  placeholder={searchType === "plate" ? "AB 123 CD" : "VF1234567890ABCDEF"}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
-                  maxLength={searchType === "plate" ? 9 : 17}
-                />
-              </div>
+              {generatedOrderId && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <CheckCircle2 className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-green-900">
+                        {ACCOUNT_UI.accountReportGeneratedSuccess}
+                      </h4>
+                      <p className="text-sm text-green-700 mt-1">
+                        {ACCOUNT_UI.accountReportAddedToAccount}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/informe/${generatedOrderId}`)}
+                        className="mt-3 w-full px-4 py-3 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Eye className="h-5 w-5" />
+                        {ACCOUNT_UI.accountViewMyReport}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {generateError && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
@@ -411,38 +365,133 @@ export default function AccountClient() {
                 </div>
               )}
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-                Costo: 1 credito. Crediti rimanenti: {creditsLoading ? "..." : credits}
-              </div>
+              {!showTerminal && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-900 mb-3">
+                      {ACCOUNT_UI.accountSearchType}
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchType("plate");
+                          setSearchValue("");
+                          setGenerateError(null);
+                        }}
+                        className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                          searchType === "plate"
+                            ? "border-blue-500 bg-blue-50 text-blue-700"
+                            : "border-slate-200 bg-white text-slate-600"
+                        }`}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <Car className="h-4 w-4" />
+                          <span className="font-medium">{ACCOUNT_UI.accountPlate}</span>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchType("vin");
+                          setSearchValue("");
+                          setGenerateError(null);
+                        }}
+                        className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                          searchType === "vin"
+                            ? "border-blue-500 bg-blue-50 text-blue-700"
+                            : "border-slate-200 bg-white text-slate-600"
+                        }`}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          <span className="font-medium">{ACCOUNT_UI.accountVIN}</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
 
-              <div className="flex gap-3 pt-2">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-900 mb-2">
+                      {searchType === "plate"
+                        ? ACCOUNT_UI.accountPlateNumber
+                        : ACCOUNT_UI.accountVINNumber}
+                    </label>
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={searchValue}
+                      onChange={(event) => {
+                        const value =
+                          searchType === "plate"
+                            ? formatItalianPlate(event.target.value)
+                            : event.target.value.toUpperCase();
+                        setSearchValue(value);
+                        if (generateError) setGenerateError(null);
+                      }}
+                      placeholder={searchType === "plate" ? "AB 123 CD" : "VF1234567890ABCDEF"}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-base"
+                      maxLength={searchType === "plate" ? 9 : 17}
+                    />
+                    {searchType === "vin" && (
+                      <p className="text-xs text-slate-500 mt-1">
+                        {ACCOUNT_UI.accountVINCharacters}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <CreditCard className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="text-sm font-medium text-blue-900">
+                          {ACCOUNT_UI.accountReportCost}
+                        </h4>
+                        <p className="text-sm text-blue-700 mt-1">
+                          {ACCOUNT_UI.accountOneCreditFromAccount}
+                        </p>
+                        <p className="text-xs text-blue-600 mt-1 font-medium">
+                          {ACCOUNT_UI.accountCreditsRemaining.replace(
+                            "{credits}",
+                            creditsLoading ? "..." : String(credits)
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {!showTerminal && (
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
                 <button
                   type="button"
                   onClick={resetGenerateModal}
                   className="flex-1 py-3 rounded-lg border border-slate-300 text-slate-700"
                   disabled={isGenerating}
                 >
-                  Annulla
+                  {ACCOUNT_UI.accountCancel}
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleGenerateReport}
                   disabled={isGenerating || !searchValue.trim() || credits <= 0}
                   className="flex-1 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50 inline-flex items-center justify-center gap-2"
                 >
                   {isGenerating ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Avvio...
+                      {ACCOUNT_UI.loadingGenerating}
                     </>
                   ) : (
                     <>
                       <Zap className="h-4 w-4" />
-                      Genera
+                      {ACCOUNT_UI.actionGenerate}
                     </>
                   )}
                 </button>
               </div>
-            </form>
             )}
           </div>
         </div>

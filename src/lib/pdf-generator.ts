@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import type { ReportSection, VehicleReportInfo } from "@/types/report.types";
+import type { AIVerification, ReportSection, VehicleReportInfo } from "@/types/report.types";
 import { SITE } from "@/lib/pricing";
 
 interface PDFGeneratorOptions {
@@ -7,6 +7,7 @@ interface PDFGeneratorOptions {
   vehicleInfo: VehicleReportInfo;
   orderId: string;
   generatedDate?: Date;
+  ai?: AIVerification;
 }
 
 export async function generateProfessionalPDF(options: PDFGeneratorOptions): Promise<Buffer> {
@@ -165,6 +166,20 @@ export async function generateProfessionalPDF(options: PDFGeneratorOptions): Pro
   });
 
   currentY += 25;
+
+  if (options.ai?.analysis) {
+    checkPageBreak(30);
+    doc.setFontSize(12);
+    setColor(colors.text);
+    doc.setFont("helvetica", "bold");
+    doc.text("SINTESI IA", margin, currentY);
+    currentY += 8;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    setColor(colors.textLight);
+    doc.text(options.ai.analysis, margin, currentY, { maxWidth: pageWidth - 2 * margin });
+    currentY += 20;
+  }
 
   options.sections.forEach((section, sectionIndex) => {
     checkPageBreak(20);

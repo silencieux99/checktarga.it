@@ -1,128 +1,189 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { Download, FileText, Loader2 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import Link from "next/link";
+import {
+  Car,
+  Check,
+  Download,
+  Eye,
+  FileText,
+  Loader2,
+  RefreshCw,
+  Search,
+  X,
+} from "lucide-react";
+import { useUserReports } from "@/hooks/useUserReports";
+import { ACCOUNT_UI } from "@/lib/account-ui-text";
 
-interface UserReport {
-  id: string;
-  orderId: string;
-  searchType: string;
-  searchValue: string;
-  pdfUrl: string;
-  formattedDate: string;
-  vehicleBrand?: string;
-  vehicleModel?: string;
-}
+export default function ReportsList() {
+  const {
+    reports,
+    loading,
+    error,
+    fetchReports,
+    downloadReport,
+    getReportDisplayName,
+    total,
+  } = useUserReports();
 
-interface ReportsListProps {
-  refreshKey?: number;
-}
+  const [downloadStatus, setDownloadStatus] = useState<
+    Record<string, "downloading" | "success" | "error">
+  >({});
 
-export default function ReportsList({ refreshKey = 0 }: ReportsListProps) {
-  const { user } = useAuth();
-  const [reports, setReports] = useState<UserReport[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchReports = useCallback(async () => {
-    if (!user) {
-      setReports([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
+  const handleDownload = async (report: (typeof reports)[0]) => {
+    setDownloadStatus((prev) => ({ ...prev, [report.id]: "downloading" }));
     try {
-      const token = await user.getIdToken();
-      const res = await fetch("/api/user-reports", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || data.error || "Errore caricamento report");
-      }
-
-      setReports(data.reports || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Errore sconosciuto");
-      setReports([]);
-    } finally {
-      setLoading(false);
+      const success = await downloadReport(report);
+      setDownloadStatus((prev) => ({
+        ...prev,
+        [report.id]: success ? "success" : "error",
+      }));
+    } catch {
+      setDownloadStatus((prev) => ({ ...prev, [report.id]: "error" }));
     }
-  }, [user]);
-
-  useEffect(() => {
-    fetchReports();
-  }, [fetchReports, refreshKey]);
+    setTimeout(() => {
+      setDownloadStatus((prev) => {
+        const next = { ...prev };
+        delete next[report.id];
+        return next;
+      });
+    }, 3000);
+  };
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Caricamento report...</p>
+      <div className="text-center py-10">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+        <p className="text-slate-600">{ACCOUNT_UI.accountLoadingReports}</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
-        <p className="text-sm text-red-700">{error}</p>
-      </div>
-    );
-  }
-
-  if (reports.length === 0) {
-    return (
-      <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
-        <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-        <p className="text-sm font-medium text-slate-700 mb-1">Nessun report generato</p>
-        <p className="text-sm text-slate-500">
-          I tuoi report completi appariranno qui dopo la generazione.
-        </p>
+      <div className="text-center py-10">
+        <p className="text-slate-600 mb-4">{ACCOUNT_UI.accountErrorLoading}</p>
+        <button
+          type="button"
+          onClick={() => fetchReports(true)}
+          className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+        >
+          {ACCOUNT_UI.accountRetry}
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      {reports.map((report) => {
-        const label =
-          report.vehicleBrand && report.vehicleModel
-            ? `${report.vehicleBrand} ${report.vehicleModel}`
-            : report.searchType === "vin"
-              ? `VIN ${report.searchValue}`
-              : `Targa ${report.searchValue}`;
+    <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <span className="text-sm text-slate-500">
+          {total} report{total === 1 ? "" : "s"}
+        </span>
+        <button
+          type="button"
+          onClick={() => fetchReports(true)}
+          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 self-end sm:self-auto"
+          title={ACCOUNT_UI.accountRefresh}
+        >
+          <RefreshCw className="h-4 w-4" />
+          {ACCOUNT_UI.accountRefresh}
+        </button>
+      </div>
 
-        return (
-          <div
-            key={report.id}
-            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4"
-          >
-            <div className="min-w-0">
-              <p className="font-medium text-slate-900 truncate">{label}</p>
-              <p className="text-sm text-slate-500 mt-0.5">
-                {report.searchType === "vin" ? "VIN" : "Targa"}:{" "}
-                <span className="font-mono">{report.searchValue}</span>
-              </p>
-              <p className="text-xs text-slate-400 mt-1">{report.formattedDate}</p>
-            </div>
-            <a
-              href={report.pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 shrink-0"
-            >
-              <Download className="h-4 w-4" />
-              Scarica PDF
-            </a>
-          </div>
-        );
-      })}
+      {reports.length === 0 ? (
+        <div className="text-center py-10 rounded-xl border border-dashed border-slate-200 bg-slate-50">
+          <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-700 font-medium mb-1">{ACCOUNT_UI.accountNoReports}</p>
+          <p className="text-sm text-slate-500">{ACCOUNT_UI.accountGenerateFirst}</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {reports.map((report) => {
+            const status = downloadStatus[report.id];
+            return (
+              <div
+                key={report.id}
+                className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="flex-shrink-0">
+                    {report.searchType === "vin" ? (
+                      <Car className="h-5 w-5 text-blue-600" />
+                    ) : (
+                      <Search className="h-5 w-5 text-blue-600" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-medium text-slate-900 truncate">
+                      {getReportDisplayName(report)}
+                    </h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs text-slate-500">
+                      <span>{report.formattedDate}</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span>{report.searchType === "vin" ? "VIN" : "Targa"}</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="font-mono truncate">{report.searchValue}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Link
+                    href={`/informe/${report.orderId || report.id}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span className="hidden sm:inline">{ACCOUNT_UI.actionView}</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(report)}
+                    disabled={status === "downloading"}
+                    className={`inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                      status === "success"
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : status === "error"
+                          ? "border-red-200 bg-red-50 text-red-700"
+                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {status === "downloading" ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="hidden sm:inline">{ACCOUNT_UI.accountDownloading}</span>
+                      </>
+                    ) : status === "success" ? (
+                      <>
+                        <Check className="h-4 w-4" />
+                        <span className="hidden sm:inline">{ACCOUNT_UI.accountDownloaded}</span>
+                      </>
+                    ) : status === "error" ? (
+                      <>
+                        <X className="h-4 w-4" />
+                        <span className="hidden sm:inline">{ACCOUNT_UI.accountErrorDownload}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="h-4 w-4" />
+                        <span className="hidden sm:inline">PDF</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {reports.length > 0 && (
+        <p className="mt-4 pt-4 border-t border-slate-200 text-xs text-slate-500 text-center">
+          {ACCOUNT_UI.tooltipReportHint}
+        </p>
+      )}
     </div>
   );
 }

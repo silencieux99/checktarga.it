@@ -152,6 +152,11 @@ export async function POST(request: NextRequest) {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         vehicleInfo: reportResult.vehicleInfo || {},
+        reportData: {
+          sections: reportResult.sections || [],
+          ai: reportResult.ai,
+        },
+        sections: reportResult.sections || [],
         source: "account_credit",
         country: "IT",
         site: "checktarga.it",
@@ -166,6 +171,7 @@ export async function POST(request: NextRequest) {
       pdfStoragePath,
       remaining: consumption.remaining,
       vehicleInfo: reportResult.vehicleInfo,
+      sections: reportResult.sections,
     });
   } catch (error) {
     console.error("[Generate] Errore API:", error);
