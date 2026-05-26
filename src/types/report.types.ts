@@ -50,6 +50,7 @@ export interface AIVerification {
 export interface ReportDataPayload {
   sections?: ReportSection[];
   ai?: AIVerification;
+  rawApiData?: Record<string, unknown>;
 }
 
 export interface ReportGenerationResult {
@@ -58,5 +59,6 @@ export interface ReportGenerationResult {
   vehicleInfo?: VehicleReportInfo;
   sections?: ReportSection[];
   ai?: AIVerification;
+  rawApiData?: Record<string, unknown>;
   error?: string;
 }

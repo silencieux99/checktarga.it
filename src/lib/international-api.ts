@@ -3,6 +3,15 @@
 
 export type CountryCode = "IT";
 
+export interface TyreSpec {
+  name?: string;
+  width?: number;
+  height?: number;
+  diameter?: number;
+  load_index?: number;
+  speed_index?: string;
+}
+
 export interface InternationalVehicleData {
   immat?: string;
   vin?: string;
@@ -31,15 +40,17 @@ export interface InternationalVehicleData {
   nb_portes?: string;
   nr_passagers?: string;
   boite_vitesse?: string;
+  code_boite_vitesse?: string;
   type_transmission?: string;
   code_type_transmission?: string;
   poids?: string;
   ptac?: string;
   capacite_litres?: string;
+  code_systeme_alimentation?: string;
+  systeme_alimentation?: string;
   ccm?: string;
   cylindres?: string;
   code_moteur?: string;
-  systeme_alimentation?: string;
   valves?: string;
   type_mine?: string;
   cnit?: string;
@@ -49,7 +60,25 @@ export interface InternationalVehicleData {
   couleur?: string;
   collection?: string;
   numero_serie?: string;
+  propulsion?: string;
+  type_compression?: string;
+  longueur?: string;
+  largeur?: string;
+  hauteur?: string;
+  empattement?: string;
+  sra_id?: string;
+  sra_group?: string;
+  sra_commercial?: string;
+  k_type?: string;
+  tecdoc_manu_id?: string;
+  tecdoc_model_id?: string;
+  tecdoc_car_id?: string;
+  tecdoc_vehicules_compatible?: string;
+  codes_platforme?: string;
+  liste_sra_commercial?: string | null;
+  pneus?: TyreSpec[];
   erreur?: string;
+  [key: string]: unknown;
 }
 
 export interface InternationalAPIResponse {

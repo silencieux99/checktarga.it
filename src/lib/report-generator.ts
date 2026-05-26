@@ -16,8 +16,8 @@ export async function generateVehicleReport(
   try {
     const vehicleInfo = mapVehicleReportInfo(vehicleData, searchValue);
     let sections = buildReportSections(vehicleData, searchValue);
-    sections = await enrichSectionsWithGemini(vehicleInfo, sections);
-    const ai = await buildAiVerification(vehicleInfo, sections);
+    sections = await enrichSectionsWithGemini(vehicleInfo, sections, vehicleData);
+    const ai = await buildAiVerification(vehicleInfo, sections, vehicleData);
 
     const pdfBuffer = await generateProfessionalPDF({
       sections,
@@ -27,7 +27,14 @@ export async function generateVehicleReport(
       ai,
     });
 
-    return { success: true, pdfBuffer, vehicleInfo, sections, ai };
+    return {
+      success: true,
+      pdfBuffer,
+      vehicleInfo,
+      sections,
+      ai,
+      rawApiData: vehicleData,
+    };
   } catch (error) {
     console.error("[Report] Errore generazione:", error);
     return {

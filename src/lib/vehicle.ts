@@ -3,6 +3,7 @@ import {
   getVehicleByVIN,
   type InternationalVehicleData,
 } from "./international-api";
+import { extractRegistrationYear } from "./api-field-utils";
 
 export function formatItalianPlate(raw: string): string {
   const cleaned = raw.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
@@ -63,11 +64,7 @@ function mapToVehiclePreview(
     };
   }
 
-  const year =
-    data.date1erCir_fr?.split("-")[2] ||
-    data.date1erCir_fr?.split("/")[2] ||
-    data.date1erCir_us?.split("-")[0] ||
-    data.debut_modele;
+  const year = extractRegistrationYear(data);
 
   return {
     found: true,

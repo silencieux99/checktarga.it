@@ -37,8 +37,10 @@ export async function GET(
       reportData: order.reportData || {
         sections: order.sections || [],
         ai: order.reportData?.ai,
+        rawApiData: order.rawApiData || order.reportData?.rawApiData,
       },
       sections: order.sections || order.reportData?.sections || [],
+      rawApiData: order.rawApiData || order.reportData?.rawApiData || null,
       vehicleInfo: order.vehicleInfo || {},
       searchType: order.searchType,
       searchValue: order.searchValue,

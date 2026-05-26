@@ -155,8 +155,10 @@ export async function POST(request: NextRequest) {
         reportData: {
           sections: reportResult.sections || [],
           ai: reportResult.ai,
+          rawApiData: reportResult.rawApiData || null,
         },
         sections: reportResult.sections || [],
+        rawApiData: reportResult.rawApiData || null,
         source: "account_credit",
         country: "IT",
         site: "checktarga.it",

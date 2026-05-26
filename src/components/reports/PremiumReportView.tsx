@@ -29,7 +29,12 @@ const getSectionIcon = (sectionId: string) => {
     const icons: Record<string, React.ComponentType<{ className?: string }>> = {
         identification: Car,
         technical: Wrench,
+        transmission: Gauge,
         body: Car,
+        registration: FileText,
+        references: Info,
+        tyres: Gauge,
+        media: Sparkles,
         performance: Gauge,
         environment: Leaf,
         ownership: Users,
@@ -381,6 +386,27 @@ export default function PremiumReportView({
                     </div>
                 </div>
             </div>
+
+            {vehicleInfo?.photo_modele && (
+                <div className="max-w-5xl mx-auto px-4 mb-8">
+                    <div className={`bg-white rounded-2xl md:rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 transition-all duration-500 ease-out ${heroEnter}`}>
+                        <div className="relative aspect-video sm:aspect-auto overflow-hidden bg-slate-100 flex items-center justify-center">
+                            <img
+                                src={vehicleInfo.photo_modele}
+                                alt={`${brand} ${model}`}
+                                className="w-full h-auto max-h-[300px] md:max-h-[500px] object-contain"
+                            />
+                            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+                            <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
+                                <div className="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-[10px] md:text-sm font-bold text-slate-900 shadow-lg flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-teal-600 rounded-full animate-pulse" />
+                                    Foto modello (API)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {vehicleInfo?.isMarketingExample && vehicleInfo?.vehicleImageUrl && (
                 <div className="max-w-5xl mx-auto px-4 mb-8">
