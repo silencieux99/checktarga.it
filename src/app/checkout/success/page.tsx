@@ -46,6 +46,8 @@ function SuccessContent() {
   const { user, loading: authLoading } = useAuth();
   const orderId = searchParams.get("order_id");
   const sessionId = searchParams.get("session_id");
+  const paymentIntentId = searchParams.get("payment_intent");
+  const redirectStatus = searchParams.get("redirect_status");
   const customerEmail = searchParams.get("customer_email");
   const [result, setResult] = useState<PaymentResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,7 +57,11 @@ function SuccessContent() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const processingStartedRef = useRef(false);
 
-  const sessionKey = orderId ? `payment_processed_order_${orderId}` : `payment_processed_${sessionId}`;
+  const sessionKey = orderId
+    ? `payment_processed_order_${orderId}`
+    : paymentIntentId
+      ? `payment_processed_pi_${paymentIntentId}`
+      : `payment_processed_${sessionId}`;
 
   useEffect(() => {
     if (loading && currentStep < STEPS.length - 1) {
@@ -83,7 +89,7 @@ function SuccessContent() {
           await fetch("/api/process-payment-success", {
             method: "POST",
             headers,
-            body: JSON.stringify({ orderId, sessionId, customerEmail }),
+            body: JSON.stringify({ orderId, sessionId, paymentIntentId, customerEmail }),
           });
 
           sessionStorage.setItem(sessionKey, "completed");
@@ -97,7 +103,7 @@ function SuccessContent() {
         const response = await fetch("/api/check-order-status", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, sessionId }),
+          body: JSON.stringify({ orderId, sessionId, paymentIntentId }),
         });
 
         if (response.ok) {
@@ -123,10 +129,16 @@ function SuccessContent() {
     } finally {
       setLoading(false);
     }
-  }, [orderId, sessionId, customerEmail, sessionKey, user]);
+  }, [orderId, sessionId, paymentIntentId, customerEmail, sessionKey, user]);
 
   useEffect(() => {
-    if ((!orderId && !sessionId) || !customerEmail) {
+    if (redirectStatus === "failed") {
+      setError("Il pagamento non è andato a buon fine. Riprova o usa un altro metodo.");
+      setLoading(false);
+      return;
+    }
+
+    if ((!orderId && !sessionId && !paymentIntentId) || !customerEmail) {
       setError("Parametri di pagamento mancanti");
       setLoading(false);
       return;
@@ -134,7 +146,7 @@ function SuccessContent() {
     if (processingStartedRef.current) return;
     processingStartedRef.current = true;
     processPayment();
-  }, [orderId, sessionId, customerEmail, processPayment]);
+  }, [orderId, sessionId, paymentIntentId, redirectStatus, customerEmail, processPayment]);
 
   useEffect(() => {
     if (!result || authLoading || !auth) return;

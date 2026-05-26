@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPackCheckoutSession, stripe } from "@/lib/stripe";
+import { createPackPaymentIntent, stripe } from "@/lib/stripe";
 import { getPlanBySku, PlanSku } from "@/lib/pricing";
 import { ensureGuestUser } from "@/lib/credits";
 import { getAdminDb } from "@/lib/firebase-admin";
@@ -55,7 +55,6 @@ export async function POST(req: NextRequest) {
 
     const guest = await ensureGuestUser(email);
     const now = Date.now();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     const orderRef = await db.collection("orders").add({
       status: "PENDING",
@@ -93,22 +92,28 @@ export async function POST(req: NextRequest) {
       searchType: vehicleInfo.searchType || "",
     };
 
-    const session = await createPackCheckoutSession({
+    const paymentIntent = await createPackPaymentIntent({
       sku: plan.sku,
       email,
       productName: `${plan.name} — ${SITE.name}`,
       amountCents: Math.round(plan.price * 100),
-      successUrl: `${siteUrl}/checkout/success?order_id=${orderId}&customer_email=${encodeURIComponent(email)}&session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${siteUrl}/checkout?sku=${plan.sku}&value=${encodeURIComponent(vehicle)}&type=${vehicleType}`,
       metadata,
     });
 
     await orderRef.update({
-      stripeSessionId: session.id,
+      paymentIntentId: paymentIntent.id,
       updatedAt: Date.now(),
     });
 
-    return NextResponse.json({ url: session.url, orderId });
+    if (!paymentIntent.client_secret) {
+      return NextResponse.json({ error: "Client secret non disponibile" }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      clientSecret: paymentIntent.client_secret,
+      orderId,
+      paymentIntentId: paymentIntent.id,
+    });
   } catch (error) {
     console.error("[prepare-checkout]", error);
     return NextResponse.json(

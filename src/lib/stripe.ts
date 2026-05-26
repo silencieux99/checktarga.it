@@ -19,6 +19,45 @@ export function getStripePriceId(sku: PlanSku): string | null {
   return map[sku] || null;
 }
 
+async function getOrCreateStripeCustomer(email: string, metadata: Record<string, string>) {
+  if (!stripe) throw new Error("Stripe non configurato");
+
+  const existing = await stripe.customers.list({ email, limit: 1 });
+  if (existing.data.length > 0) {
+    return existing.data[0];
+  }
+
+  return stripe.customers.create({
+    email,
+    metadata,
+  });
+}
+
+export async function createPackPaymentIntent(params: {
+  sku: PlanSku;
+  email: string;
+  amountCents: number;
+  metadata: Record<string, string>;
+  productName: string;
+}): Promise<Stripe.PaymentIntent> {
+  if (!stripe) throw new Error("Stripe non configurato");
+
+  const customer = await getOrCreateStripeCustomer(params.email, {
+    guest_checkout: "true",
+    site: params.metadata.site || "",
+  });
+
+  return stripe.paymentIntents.create({
+    amount: params.amountCents,
+    currency: "eur",
+    customer: customer.id,
+    receipt_email: params.email,
+    description: params.productName,
+    metadata: params.metadata,
+    automatic_payment_methods: { enabled: true },
+  });
+}
+
 export async function createPackCheckoutSession(params: {
   sku: PlanSku;
   email: string;
