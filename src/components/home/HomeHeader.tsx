@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Container from "@/components/Container";
+import { useAuth } from "@/context/AuthContext";
 
 const NAV = [
   { href: "/blog", label: "Blog" },
@@ -11,6 +12,7 @@ const NAV = [
 ];
 
 export default function HomeHeader() {
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -48,12 +50,28 @@ export default function HomeHeader() {
               </Link>
             ))}
           </div>
-          <Link
-            href="/prezzi"
-            className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-          >
-            Verifica targa
-          </Link>
+          <div className="ml-2 flex items-center gap-2">
+            {!user && (
+              <Link
+                href="/login"
+                className="rounded-full px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              >
+                Accedi
+              </Link>
+            )}
+            <Link
+              href="/account"
+              className="rounded-full border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              {user ? "Il mio account" : "Area personale"}
+            </Link>
+            <Link
+              href="/prezzi"
+              className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+            >
+              Verifica targa
+            </Link>
+          </div>
         </nav>
 
         <button
@@ -81,6 +99,22 @@ export default function HomeHeader() {
                 {link.label}
               </Link>
             ))}
+            {!user && (
+              <Link
+                href="/login"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                onClick={() => setOpen(false)}
+              >
+                Accedi
+              </Link>
+            )}
+            <Link
+              href="/account"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              onClick={() => setOpen(false)}
+            >
+              {user ? "Il mio account" : "Area personale"}
+            </Link>
             <Link
               href="/prezzi"
               className="mt-2 rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white"

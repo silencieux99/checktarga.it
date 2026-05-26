@@ -27,7 +27,8 @@ const COLUMNS = [
     links: [
       { label: "Contattaci", href: `mailto:${SITE.supportEmail}` },
       { label: "Blog", href: "/blog" },
-      { label: "Area personale", href: "/account" },
+      { label: "Accedi", href: "/login" },
+      { label: "Il mio account", href: "/account" },
     ],
   },
   {
