@@ -1,0 +1,27 @@
+{
+  "name": "CheckTarga.it — Storico veicolo e verifica targa",
+  "short_name": "CheckTarga",
+  "description": "Verifica lo storico di un'auto usata in Italia: chilometri, sinistri, revisioni e dati PRA.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "utilities", "automotive"],
+  "lang": "it",
+  "dir": "ltr"
+}

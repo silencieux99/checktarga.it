@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
+import { buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Note legali",
+  description: "Note legali, editor del sito e informazioni sull'hosting di CheckTarga.it.",
+  path: "/note-legali",
+});
 
 export default function NoteLegaliPage() {
   return (

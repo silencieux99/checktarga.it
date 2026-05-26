@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
+import { buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Termini di servizio",
+  description: "Termini e condizioni del servizio CheckTarga.it per i report storico veicolo.",
+  path: "/termini",
+});
 
 export default function TerminiPage() {
   return (
@@ -13,7 +21,7 @@ export default function TerminiPage() {
       </p>
       <p>
         Il servizio non sostituisce una perizia meccanica o una consulenza legale. L&apos;utente
-        resta responsabile della decisione d&apos;acquisto del veicolo.
+        resta responsabile delle decisioni di acquisto.
       </p>
     </LegalLayout>
   );

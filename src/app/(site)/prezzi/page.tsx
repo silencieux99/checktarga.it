@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import PricingCards from "@/components/PricingCards";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Prezzi",
-};
+  description:
+    "Pacchetti report veicolo senza abbonamento. Scegli il piano giusto per verificare targa o VIN in Italia.",
+  path: "/prezzi",
+});
 
 export default function PrezziPage() {
   return (

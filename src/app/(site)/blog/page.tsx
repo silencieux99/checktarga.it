@@ -1,6 +1,12 @@
-export const metadata = {
+import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
   title: "Blog",
-};
+  description:
+    "Guide pratiche su auto usate in Italia: chilometri, fermo amministrativo, revisioni e consigli per l'acquisto.",
+  path: "/blog",
+});
 
 const POSTS = [
   {

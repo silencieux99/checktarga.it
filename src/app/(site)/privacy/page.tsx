@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
+import { buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Informativa privacy",
+  description: "Informativa privacy di CheckTarga.it sul trattamento dei dati personali.",
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (

@@ -1,10 +1,12 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import ReportPreviewView from "@/components/report-preview/ReportPreviewView";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Anteprima report",
-  robots: { index: false, follow: true },
-};
+  noIndex: true,
+});
 
 export default function AnteprimaReportPage() {
   return (

@@ -1,3 +1,4 @@
+import StructuredData from "@/components/StructuredData";
 import NewsTicker from "@/components/home/NewsTicker";
 import HomeHeader from "@/components/home/HomeHeader";
 import HomeHero from "@/components/home/HomeHero";
@@ -16,6 +17,7 @@ import HomeFooter from "@/components/home/HomeFooter";
 export default function HomePage() {
   return (
     <div className="mobile-compact min-h-screen bg-white">
+      <StructuredData />
       <NewsTicker />
       <HomeHeader />
       <main>

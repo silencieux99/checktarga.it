@@ -1,3 +1,13 @@
+import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Esempio report",
+  description:
+    "Scopri la struttura di un report CheckTarga: identificazione veicolo, chilometri, proprietà e vincoli.",
+  path: "/esempio-report",
+});
+
 const DEMO_SECTIONS = [
   {
     title: "Identificazione veicolo",

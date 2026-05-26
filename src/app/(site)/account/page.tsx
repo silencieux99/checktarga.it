@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import AccountClient from "./AccountClient";
-import { SITE } from "@/lib/pricing";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: `Area personale | ${SITE.name}`,
-  description: "Gestisci i tuoi crediti e genera report veicolo su CheckTarga.it",
-  robots: { index: false, follow: false },
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: "Area personale",
+  description: "Gestisci i tuoi crediti e genera report veicolo su CheckTarga.it.",
+  path: "/account",
+  noIndex: true,
+});
 
 export default function AccountPage() {
   return <AccountClient />;

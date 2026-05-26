@@ -1,20 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SITE } from "@/lib/pricing";
 import { AuthProvider } from "@/context/AuthContext";
+import { rootMetadata, SEO } from "@/lib/seo";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
-export const metadata: Metadata = {
-  title: {
-    default: `${SITE.name} — Storico veicolo e verifica targa`,
-    template: `%s | ${SITE.name}`,
-  },
-  description:
-    "Controlla lo storico di un'auto usata in Italia: chilometri, sinistri, revisioni e dati PRA prima di firmare.",
-  metadataBase: new URL(`https://${SITE.domain}`),
+export const metadata: Metadata = rootMetadata;
+
+export const viewport: Viewport = {
+  themeColor: SEO.themeColor,
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
