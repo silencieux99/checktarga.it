@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import Logo from "@/components/brand/Logo";
 
 const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "")
   .split(",")
@@ -41,11 +42,10 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-[#0A0A0A] px-4">
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#111111] p-8 shadow-2xl">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-lg font-bold">
-            CT
+          <div className="mb-5 flex justify-center">
+            <Logo size="lg" variant="admin" href={null} />
           </div>
-          <h1 className="text-2xl font-bold text-white">Admin CheckTarga</h1>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="text-sm text-slate-400">
             Accedi per monitorare visitatori, clienti e vendite.
           </p>
         </div>

@@ -1,12 +1,19 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getPlanBySku, formatPrice } from "@/lib/pricing";
+import {
+  formatPrice,
+  formatSubscriptionIntroLabel,
+  getPlanBySku,
+  isSubscriptionPlan,
+} from "@/lib/pricing";
 import { ArrowLeft, Loader2, Mail, ShieldCheck } from "lucide-react";
 import PageLoader from "@/components/PageLoader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import StripeCheckoutForm from "@/components/checkout/StripeCheckoutForm";
+import SubscriptionTerms from "@/components/checkout/SubscriptionTerms";
 
 function CheckoutContent() {
   const router = useRouter();
@@ -17,6 +24,8 @@ function CheckoutContent() {
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsError, setTermsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"email" | "payment">("email");
@@ -24,19 +33,30 @@ function CheckoutContent() {
   const [orderId, setOrderId] = useState<string | null>(null);
 
   const plan = sku ? getPlanBySku(sku) : undefined;
+  const subscriptionPlan = isSubscriptionPlan(plan) ? plan : null;
 
   useEffect(() => {
-    if (!sku || !plan) router.replace("/prezzi");
+    if (!sku || !plan || plan.visible === false) router.replace("/prezzi");
   }, [sku, plan, router]);
 
   const preparePayment = async () => {
+    let hasError = false;
+
+    if (!acceptedTerms) {
+      setTermsError(true);
+      hasError = true;
+    } else {
+      setTermsError(false);
+    }
+
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError(true);
-      return;
+      hasError = true;
+    } else {
+      setEmailError(false);
     }
-    if (!plan) return;
 
-    setEmailError(false);
+    if (hasError || !plan) return;
     setLoading(true);
     setError(null);
 
@@ -73,6 +93,10 @@ function CheckoutContent() {
     return <PageLoader message="Caricamento checkout..." />;
   }
 
+  const amountLabel = subscriptionPlan
+    ? formatSubscriptionIntroLabel(subscriptionPlan)
+    : formatPrice(plan.price);
+
   return (
     <div className="min-h-[70vh] py-10 relative">
       {loading && step === "email" && (
@@ -84,17 +108,17 @@ function CheckoutContent() {
 
       <div className="max-w-lg mx-auto px-4">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 text-teal-700 text-sm font-semibold mb-3">
+          <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-accent">
             <ShieldCheck className="w-4 h-4" />
             Pagamento sicuro Stripe
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Completa il tuo ordine</h1>
+          <h1 className="display-heading text-2xl sm:text-3xl">Completa il tuo ordine</h1>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 mb-6">
+        <div className="card-surface mb-6 p-6">
           <h2 className="font-semibold text-slate-900">{plan.name}</h2>
           <p className="text-sm text-slate-600 mt-1">{plan.description}</p>
-          <p className="text-2xl font-bold text-slate-900 mt-4">{formatPrice(plan.price)}</p>
+          <p className="mt-4 text-2xl font-bold text-slate-900">{amountLabel}</p>
           {vehicle && (
             <p className="text-xs text-slate-500 mt-3">
               Veicolo: {vehicleType === "plate" ? "Targa" : "VIN"} {vehicle}
@@ -102,76 +126,132 @@ function CheckoutContent() {
           )}
         </div>
 
-        {step === "email" ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
-            <label className="block text-sm font-semibold text-slate-700">
-              Email per ricevere l&apos;accesso al report
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (emailError) setEmailError(false);
-                }}
-                placeholder="nome@email.it"
-                disabled={loading}
-                className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
-                  emailError ? "border-red-300 bg-red-50" : "border-slate-200 bg-slate-50"
-                } focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 disabled:opacity-60`}
-              />
-            </div>
-            {emailError && (
-              <p className="text-sm text-red-600">Inserisci un indirizzo email valido</p>
-            )}
-            {error && <p className="text-sm text-red-600">{error}</p>}
-
-            <button
-              type="button"
-              onClick={preparePayment}
-              disabled={loading}
-              className="w-full rounded-xl bg-teal-700 py-3.5 text-white font-semibold hover:bg-teal-800 disabled:opacity-60 inline-flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Preparazione...
-                </>
-              ) : (
-                "Continua al pagamento"
+        <div className="mt-6">
+          {step === "email" ? (
+            <div className="card-surface space-y-4 p-6">
+              <label className="block text-sm font-semibold text-slate-700">
+                Email per ricevere l&apos;accesso al report
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailError) setEmailError(false);
+                  }}
+                  placeholder="nome@email.it"
+                  disabled={loading}
+                  className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
+                    emailError ? "border-red-300 bg-red-50" : "border-slate-200 bg-slate-50"
+                  } focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 disabled:opacity-60`}
+                />
+              </div>
+              {emailError && (
+                <p className="text-sm text-red-600">Inserisci un indirizzo email valido</p>
               )}
-            </button>
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
-            <div className="rounded-xl bg-teal-50 border border-teal-100 px-4 py-3 text-sm text-teal-900">
-              <span className="font-medium">Email:</span> {email}
+              {error && <p className="text-sm text-red-600">{error}</p>}
+
+              <label
+                className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${
+                  termsError
+                    ? "border-red-200 bg-red-50"
+                    : "border-slate-200 bg-slate-50 hover:border-slate-300"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => {
+                    setAcceptedTerms(e.target.checked);
+                    if (termsError) setTermsError(false);
+                  }}
+                  disabled={loading}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-accent focus:ring-brand-accent/30"
+                />
+                <span className="text-sm leading-relaxed text-slate-600">
+                  Ho letto e accetto i{" "}
+                  <Link
+                    href="/termini"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Termini e condizioni
+                  </Link>{" "}
+                  e l&apos;{" "}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Informativa privacy
+                  </Link>
+                  .
+                </span>
+              </label>
+              {termsError && (
+                <p className="text-sm text-red-600">
+                  Devi accettare i termini per continuare.
+                </p>
+              )}
+
+              <button
+                type="button"
+                onClick={preparePayment}
+                disabled={loading || !acceptedTerms}
+                className="btn-accent w-full disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Preparazione...
+                  </>
+                ) : (
+                  "Continua al pagamento"
+                )}
+              </button>
             </div>
+          ) : (
+            <div className="card-surface space-y-4 p-6">
+              <div className="rounded-xl border border-brand-accent/20 bg-emerald-50 px-4 py-3 text-sm text-brand">
+                <span className="font-medium">Email:</span> {email}
+              </div>
 
-            {clientSecret && orderId && (
-              <StripeCheckoutForm
-                clientSecret={clientSecret}
-                orderId={orderId}
-                email={email}
-                amountLabel={formatPrice(plan.price)}
-              />
-            )}
+              {clientSecret && orderId && (
+                <StripeCheckoutForm
+                  clientSecret={clientSecret}
+                  orderId={orderId}
+                  email={email}
+                  amountLabel={amountLabel}
+                  isSubscription={Boolean(subscriptionPlan)}
+                />
+              )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setStep("email");
-                setClientSecret(null);
-                setOrderId(null);
-                setError(null);
-              }}
-              className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Modifica email
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("email");
+                  setClientSecret(null);
+                  setOrderId(null);
+                  setError(null);
+                }}
+                className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Modifica email
+              </button>
+            </div>
+          )}
+        </div>
+
+        {subscriptionPlan && (
+          <div className="mt-8 border-t border-slate-100 pt-4">
+            <SubscriptionTerms plan={subscriptionPlan} variant="finePrint" />
           </div>
         )}
       </div>

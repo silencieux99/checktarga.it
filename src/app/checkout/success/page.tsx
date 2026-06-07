@@ -6,17 +6,15 @@ import Link from "next/link";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import {
   AlertTriangle,
-  Bolt,
+  ArrowRight,
   Check,
-  CheckCircle2,
   ClipboardCopy,
-  CreditCard,
   Eye,
   EyeOff,
-  Mail,
-  ShieldCheck,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
-import Container from "@/components/Container";
+import Logo from "@/components/brand/Logo";
 import PageLoader from "@/components/PageLoader";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
@@ -35,11 +33,15 @@ interface PaymentResult {
 }
 
 const STEPS = [
-  { icon: CreditCard, label: "Verifica del pagamento" },
-  { icon: ShieldCheck, label: "Sicurezza della transazione" },
-  { icon: Bolt, label: "Aggiunta crediti" },
-  { icon: Mail, label: "Invio conferma email" },
+  "Verifica del pagamento",
+  "Conferma transazione",
+  "Aggiunta crediti",
+  "Invio email di conferma",
 ];
+
+function formatEuro(amount: number) {
+  return `${amount.toFixed(2).replace(".", ",")} €`;
+}
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -179,82 +181,78 @@ function SuccessContent() {
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10">
-            <div className="w-12 h-12 mx-auto mb-6 bg-slate-100 rounded-xl flex items-center justify-center">
-              <div className="w-6 h-6 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-            </div>
-
-            <h2 className="text-xl font-bold text-center text-slate-900 mb-8">
-              Finalizzazione del tuo ordine
-            </h2>
-
-            <div className="space-y-4 mb-8">
-              {STEPS.map((step, index) => {
-                const Icon = step.icon;
-                const isActive = index <= currentStep;
-                const isComplete = index < currentStep;
-
-                return (
-                  <div key={step.label} className="flex items-center gap-3">
-                    <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                        isActive ? "bg-slate-900" : "bg-slate-100"
-                      }`}
-                    >
-                      {isComplete ? (
-                        <Check className="w-4 h-4 text-white" />
-                      ) : (
-                        <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
-                      )}
-                    </div>
-                    <p
-                      className={`text-sm ${
-                        isActive ? "text-slate-900 font-medium" : "text-slate-400"
-                      }`}
-                    >
-                      {step.label}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-
-            <p className="text-center text-sm text-slate-500 animate-pulse">
-              Attendere prego, non chiudere questa pagina...
-            </p>
-          </div>
+  const shell = (children: React.ReactNode) => (
+    <div className="min-h-[100dvh] bg-white">
+      <div className="mx-auto w-full max-w-md px-5 py-8 sm:py-12">
+        <div className="mb-10">
+          <Logo size="sm" href="/" />
         </div>
+        {children}
+      </div>
+    </div>
+  );
+
+  if (loading) {
+    return shell(
+      <div>
+        <div className="mb-8 flex items-center gap-3 text-slate-900">
+          <Loader2 className="h-5 w-5 shrink-0 animate-spin text-slate-400" />
+          <h1 className="text-xl font-semibold tracking-tight">Elaborazione in corso</h1>
+        </div>
+
+        <p className="mb-8 text-sm leading-relaxed text-slate-600">
+          Stiamo confermando il pagamento. Non chiudere questa pagina.
+        </p>
+
+        <ol className="space-y-4 border-t border-slate-200 pt-6">
+          {STEPS.map((label, index) => {
+            const done = index < currentStep;
+            const active = index === currentStep;
+            return (
+              <li key={label} className="flex items-start gap-3 text-sm">
+                <span
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                    done
+                      ? "bg-slate-900 text-white"
+                      : active
+                        ? "border-2 border-slate-900 text-slate-900"
+                        : "border border-slate-200 text-slate-300"
+                  }`}
+                >
+                  {done ? <Check className="h-3 w-3" /> : index + 1}
+                </span>
+                <span className={active || done ? "text-slate-900" : "text-slate-400"}>{label}</span>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 md:p-10">
-            <div className="w-12 h-12 mx-auto mb-6 bg-red-50 rounded-xl flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
-            </div>
-            <h2 className="text-xl font-bold text-center text-slate-900 mb-4">Ops!</h2>
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-              <p className="text-red-800 text-sm">{error}</p>
-            </div>
-            <p className="text-center text-slate-600 text-sm mb-8">
-              Non preoccuparti: se il pagamento è andato a buon fine, i crediti arriveranno via email.
-            </p>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-medium"
-            >
-              Riprova
-            </button>
-          </div>
+    return shell(
+      <div>
+        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
+          <AlertTriangle className="h-5 w-5 text-red-600" />
+        </div>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Errore</h1>
+        <p className="mt-4 text-sm leading-relaxed text-slate-600">{error}</p>
+        <p className="mt-3 text-sm text-slate-500">
+          Se il pagamento è andato a buon fine, i crediti arriveranno via email entro pochi minuti.
+        </p>
+        <div className="mt-8 space-y-3">
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="btn-accent w-full"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Riprova
+          </button>
+          <Link href="/prezzi" className="btn-outline w-full">
+            Torna ai prezzi
+          </Link>
         </div>
       </div>
     );
@@ -262,145 +260,131 @@ function SuccessContent() {
 
   if (!result) return null;
 
-  return (
-    <div className="min-h-screen bg-white">
-      <Container className="py-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10">
-            <div className="w-16 h-16 mx-auto mb-6 bg-slate-900 rounded-2xl flex items-center justify-center">
-              <CheckCircle2 className="w-9 h-9 text-white" />
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-              {result.newAccount ? "Benvenuto su CheckTarga!" : "Pagamento confermato"}
-            </h1>
-            <p className="text-lg text-slate-600">
-              {result.newAccount
-                ? "Il tuo account è attivo e i crediti sono pronti."
-                : "I crediti sono stati aggiunti istantaneamente al tuo account."}
-            </p>
-          </div>
+  return shell(
+    <div>
+      <div className="mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-slate-900">
+        <Check className="h-5 w-5 text-white" strokeWidth={2.5} />
+      </div>
 
-          <div className="grid md:grid-cols-2 gap-4 mb-8">
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
-              <h2 className="text-sm font-semibold text-slate-500 mb-4">Riepilogo</h2>
-              <div className="space-y-4 text-sm">
-                <div className="flex justify-between gap-4">
-                  <span className="text-slate-600">Prodotto</span>
-                  <span className="font-bold text-slate-900">{result.productName}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-slate-600">Importo pagato</span>
-                  <span className="font-bold text-slate-900">{result.amount.toFixed(2)} €</span>
-                </div>
-                <div className="pt-4 border-t border-slate-200 flex justify-between gap-4">
-                  <span className="text-slate-600">Crediti aggiunti</span>
-                  <span className="text-2xl font-bold text-slate-900">+{result.creditsAdded}</span>
-                </div>
-              </div>
-              <div className="mt-6 bg-slate-900 rounded-xl p-4 flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-300">Saldo totale</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-white">{result.totalCredits}</span>
-                  <span className="text-xs text-slate-400">crediti</span>
-                </div>
-              </div>
-            </div>
+      <h1 className="mt-5 text-2xl font-semibold tracking-tight text-slate-900">
+        {result.newAccount ? "Account creato" : "Pagamento confermato"}
+      </h1>
+      <p className="mt-2 text-sm leading-relaxed text-slate-600">
+        {result.newAccount
+          ? "I crediti sono disponibili nell'area personale."
+          : "I crediti sono stati aggiunti al tuo account."}
+      </p>
 
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
-              <h2 className="text-sm font-semibold text-slate-500 mb-4">
-                {result.emailSent ? "Email inviata" : "Email in corso"}
-              </h2>
-              {result.emailSent ? (
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-emerald-500 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-slate-900 font-medium">Conferma inviata</p>
-                    <p className="text-xs text-slate-500 mt-1">Ricevuta inviata a {customerEmail}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-amber-800">Email in elaborazione...</p>
-                  <div className="p-3 bg-amber-50 rounded-xl text-xs text-amber-700">
-                    Controlla anche la cartella spam se non la trovi entro qualche minuto.
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {result.newAccount && result.password && customerEmail && (
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 mb-8">
-              <h2 className="text-sm font-semibold text-slate-500 mb-6">I tuoi accessi</h2>
-              <div className="space-y-3">
-                <div className="bg-white rounded-xl border border-slate-200 p-4">
-                  <label className="text-xs font-medium text-slate-500 mb-2 block">Email</label>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm text-slate-900 flex-1">{customerEmail}</span>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(customerEmail, "email")}
-                      className="p-1.5 hover:bg-slate-100 rounded-lg"
-                    >
-                      {copiedField === "email" ? (
-                        <Check className="w-4 h-4 text-slate-900" />
-                      ) : (
-                        <ClipboardCopy className="w-4 h-4 text-slate-400" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div className="bg-white rounded-xl border border-slate-200 p-4">
-                  <label className="text-xs font-medium text-slate-500 mb-2 block">Password</label>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm text-slate-900 flex-1">
-                      {showPassword ? result.password : "••••••••••••"}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((value) => !value)}
-                      className="p-1.5 hover:bg-slate-100 rounded-lg"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4 text-slate-400" />
-                      ) : (
-                        <Eye className="w-4 h-4 text-slate-400" />
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(result.password!, "password")}
-                      className="p-1.5 hover:bg-slate-100 rounded-lg"
-                    >
-                      {copiedField === "password" ? (
-                        <Check className="w-4 h-4 text-slate-900" />
-                      ) : (
-                        <ClipboardCopy className="w-4 h-4 text-slate-400" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 p-3 bg-slate-100 rounded-xl text-xs text-slate-600">
-                Conserva queste credenziali. Potrai cambiarle dall&apos;area personale.
-              </div>
-            </div>
-          )}
-
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 md:p-8">
-            <h3 className="text-lg font-bold text-blue-950 mb-2">Prossimo passo</h3>
-            <p className="text-sm text-blue-900/90 leading-relaxed mb-6">
-              Vai all&apos;area personale per generare il tuo primo report completo con targa o VIN.
-            </p>
-            <Link
-              href="/account"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3.5 text-sm font-semibold text-white hover:bg-slate-800"
-            >
-              Vai all&apos;area personale
-            </Link>
-          </div>
+      <dl className="mt-10 divide-y divide-slate-200 border-t border-slate-200">
+        <div className="flex items-baseline justify-between gap-4 py-4">
+          <dt className="text-sm text-slate-500">Prodotto</dt>
+          <dd className="text-right text-sm font-medium text-slate-900">{result.productName}</dd>
         </div>
-      </Container>
+        <div className="flex items-baseline justify-between gap-4 py-4">
+          <dt className="text-sm text-slate-500">Importo pagato</dt>
+          <dd className="text-right text-sm font-medium tabular-nums text-slate-900">
+            {formatEuro(result.amount)}
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-4 py-4">
+          <dt className="text-sm text-slate-500">Crediti aggiunti</dt>
+          <dd className="text-right text-sm font-medium tabular-nums text-slate-900">
+            +{result.creditsAdded}
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-4 py-4">
+          <dt className="text-sm text-slate-500">Saldo attuale</dt>
+          <dd className="text-right text-base font-semibold tabular-nums text-slate-900">
+            {result.totalCredits} crediti
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-4 py-4">
+          <dt className="text-sm text-slate-500">Email</dt>
+          <dd className="min-w-0 text-right text-sm text-slate-900">
+            <span className="break-all">{customerEmail}</span>
+            {!result.emailSent && (
+              <span className="mt-1 block text-xs text-slate-400">Conferma in invio…</span>
+            )}
+          </dd>
+        </div>
+      </dl>
+
+      {result.newAccount && result.password && customerEmail && (
+        <section className="mt-10 border-t border-slate-200 pt-8">
+          <h2 className="text-sm font-semibold text-slate-900">Accesso all&apos;account</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Conserva queste credenziali. Puoi modificarle dall&apos;area personale.
+          </p>
+
+          <div className="mt-5 space-y-4">
+            <div>
+              <p className="text-xs text-slate-500">Email</p>
+              <div className="mt-1 flex items-center justify-between gap-3 border-b border-slate-200 pb-2">
+                <span className="min-w-0 truncate font-mono text-sm text-slate-900">
+                  {customerEmail}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(customerEmail, "email")}
+                  className="shrink-0 p-2 text-slate-400 hover:text-slate-900"
+                  aria-label="Copia email"
+                >
+                  {copiedField === "email" ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <ClipboardCopy className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs text-slate-500">Password</p>
+              <div className="mt-1 flex items-center justify-between gap-3 border-b border-slate-200 pb-2">
+                <span className="font-mono text-sm text-slate-900">
+                  {showPassword ? result.password : "••••••••••••"}
+                </span>
+                <div className="flex shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="p-2 text-slate-400 hover:text-slate-900"
+                    aria-label={showPassword ? "Nascondi password" : "Mostra password"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(result.password!, "password")}
+                    className="p-2 text-slate-400 hover:text-slate-900"
+                    aria-label="Copia password"
+                  >
+                    {copiedField === "password" ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <ClipboardCopy className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <div className="mt-10 space-y-3 border-t border-slate-200 pt-8">
+        <Link href="/account" className="btn-accent w-full">
+          Vai all&apos;area personale
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+        <Link href="/" className="btn-outline w-full">
+          Torna al sito
+        </Link>
+      </div>
+
+      <p className="mt-8 text-center text-xs text-slate-400">
+        Pagamento elaborato tramite Stripe
+      </p>
     </div>
   );
 }

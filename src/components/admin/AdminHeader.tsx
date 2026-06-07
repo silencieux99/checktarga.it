@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Logo from "@/components/brand/Logo";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
@@ -9,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 const NAV = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/orders", label: "Ordini" },
+  { href: "/admin/subscriptions", label: "Abbonamenti" },
   { href: "/admin/clients", label: "Clienti" },
   { href: "/admin/users", label: "Utenti" },
   { href: "/admin/reports", label: "Report" },
@@ -34,9 +36,7 @@ export default function AdminHeader() {
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0A0A0A]/95 backdrop-blur">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-14 items-center justify-between gap-3 sm:h-16">
-          <Link href="/admin" className="shrink-0 font-bold text-white">
-            CheckTarga<span className="text-blue-500"> Admin</span>
-          </Link>
+          <Logo size="sm" variant="admin" href="/admin" />
 
           <div className="flex items-center gap-2">
             <Link

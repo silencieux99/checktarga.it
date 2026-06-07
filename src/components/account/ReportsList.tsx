@@ -55,8 +55,8 @@ export default function ReportsList() {
   if (loading) {
     return (
       <div className="text-center py-10">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
-        <p className="text-slate-600">{ACCOUNT_UI.accountLoadingReports}</p>
+        <Loader2 className="w-8 h-8 text-brand-accent animate-spin mx-auto mb-4" />
+        <p className="text-brand-muted">{ACCOUNT_UI.accountLoadingReports}</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function ReportsList() {
             href={indexUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mb-4 inline-block text-sm font-semibold text-blue-600 hover:text-blue-700 underline"
+            className="mb-4 inline-block text-sm font-semibold text-brand-accent hover:text-brand-accent-hover underline"
           >
             Crea l&apos;indice Firestore
           </a>
@@ -116,14 +116,14 @@ export default function ReportsList() {
             return (
               <div
                 key={report.id}
-                className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                className="flex flex-col gap-3 rounded-xl border border-brand-border p-4 transition-colors hover:border-slate-300 hover:bg-brand-surface sm:flex-row sm:items-center"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="flex-shrink-0">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-accent/10 text-brand-accent">
                     {report.searchType === "vin" ? (
-                      <Car className="h-5 w-5 text-blue-600" />
+                      <Car className="h-4 w-4" />
                     ) : (
-                      <Search className="h-5 w-5 text-blue-600" />
+                      <Search className="h-4 w-4" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -143,7 +143,7 @@ export default function ReportsList() {
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <Link
                     href={`/informe/${report.orderId || report.id}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-accent-hover"
                   >
                     <Eye className="h-4 w-4" />
                     <span className="hidden sm:inline">{ACCOUNT_UI.actionView}</span>

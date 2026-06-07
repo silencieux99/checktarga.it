@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 type SiteAuthActionsProps = {
-  variant: "home-desktop" | "home-mobile" | "site-nav" | "site-mobile";
+  variant: "home-desktop" | "home-mobile" | "site-nav" | "site-mobile" | "site-desktop";
   onNavigate?: () => void;
 };
 
@@ -19,61 +19,44 @@ export default function SiteAuthActions({ variant, onNavigate }: SiteAuthActions
     router.push("/");
   };
 
-  if (variant === "home-desktop") {
+  const desktopClass =
+    "rounded-lg px-3.5 py-2 text-sm font-medium text-brand-muted transition-colors hover:bg-brand-surface hover:text-brand";
+  const mobileClass =
+    "rounded-xl px-3 py-3 text-sm font-medium text-brand hover:bg-brand-surface";
+
+  if (variant === "site-desktop" || variant === "home-desktop") {
     return (
-      <>
+      <div className="flex items-center gap-1">
         {!user && (
-          <Link
-            href="/login"
-            className="rounded-full px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
-          >
+          <Link href="/login" className={desktopClass}>
             Accedi
           </Link>
         )}
-        <Link
-          href="/account"
-          className="rounded-full border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-        >
+        <Link href="/account" className={desktopClass}>
           {user ? "Il mio account" : "Area personale"}
         </Link>
         {user && (
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="rounded-full border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-          >
+          <button type="button" onClick={handleSignOut} className={desktopClass}>
             Esci
           </button>
         )}
-      </>
+      </div>
     );
   }
 
-  if (variant === "home-mobile") {
+  if (variant === "site-mobile" || variant === "home-mobile") {
     return (
       <>
         {!user && (
-          <Link
-            href="/login"
-            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            onClick={onNavigate}
-          >
+          <Link href="/login" className={mobileClass} onClick={onNavigate}>
             Accedi
           </Link>
         )}
-        <Link
-          href="/account"
-          className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          onClick={onNavigate}
-        >
+        <Link href="/account" className={mobileClass} onClick={onNavigate}>
           {user ? "Il mio account" : "Area personale"}
         </Link>
         {user && (
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
+          <button type="button" onClick={handleSignOut} className={`${mobileClass} w-full text-left`}>
             Esci
           </button>
         )}
@@ -85,19 +68,15 @@ export default function SiteAuthActions({ variant, onNavigate }: SiteAuthActions
     return (
       <>
         {!user && (
-          <Link href="/login" className="hover:text-blue-600">
+          <Link href="/login" className="hover:text-brand-accent">
             Accedi
           </Link>
         )}
-        <Link href="/account" className="hover:text-blue-600">
+        <Link href="/account" className="hover:text-brand-accent">
           {user ? "Il mio account" : "Area personale"}
         </Link>
         {user && (
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="hover:text-blue-600"
-          >
+          <button type="button" onClick={handleSignOut} className="hover:text-brand-accent">
             Esci
           </button>
         )}
@@ -105,25 +84,5 @@ export default function SiteAuthActions({ variant, onNavigate }: SiteAuthActions
     );
   }
 
-  return (
-    <>
-      {!user && (
-        <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-blue-600">
-          Accedi
-        </Link>
-      )}
-      <Link href="/account" className="text-sm font-medium text-slate-600 hover:text-blue-600">
-        Account
-      </Link>
-      {user && (
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="text-sm font-medium text-slate-600 hover:text-blue-600"
-        >
-          Esci
-        </button>
-      )}
-    </>
-  );
+  return null;
 }

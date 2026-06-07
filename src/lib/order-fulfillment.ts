@@ -1,11 +1,12 @@
 import { FieldValue, DocumentData, DocumentReference } from "firebase-admin/firestore";
 import { getAdminAuth, getAdminDb } from "./firebase-admin";
 import { addCredits, getCredits } from "./credits";
-import { getPlanBySku, SITE, PlanSku } from "./pricing";
+import { getPlanBySku, isSubscriptionPlan, SITE, PlanSku } from "./pricing";
 import { stripe } from "./stripe";
 import { sendOrderConfirmationEmail } from "./order-confirmation-email-service";
 import { sendWelcomeEmail } from "./welcome-email-service";
 import { sendTelegramOrderNotification } from "./telegram-notification-service";
+import { scheduleSubscriptionAfterIntroPayment } from "./subscription-service";
 
 export interface FulfillmentResult {
   success: boolean;
@@ -247,6 +248,35 @@ export async function fulfillPackOrder(options: {
         password || updatedOrder.password || null,
         newAccount
       );
+    }
+
+    if (
+      isSubscriptionPlan(plan) &&
+      !updatedOrder.subscriptionScheduled &&
+      paymentIntent.setup_future_usage === "off_session"
+    ) {
+      try {
+        await scheduleSubscriptionAfterIntroPayment({
+          orderId: options.orderId,
+          paymentIntentId,
+          customerUid,
+        });
+      } catch (subscriptionError) {
+        await orderRef.update({
+          subscriptionError:
+            subscriptionError instanceof Error
+              ? subscriptionError.message
+              : "Errore programmazione abbonamento",
+          updatedAt: Date.now(),
+          processingLogs: FieldValue.arrayUnion(
+            `[${new Date().toISOString()}] Errore abbonamento: ${
+              subscriptionError instanceof Error
+                ? subscriptionError.message
+                : "Errore sconosciuto"
+            }`
+          ),
+        });
+      }
     }
 
     if (!updatedOrder.telegramNotificationSent) {

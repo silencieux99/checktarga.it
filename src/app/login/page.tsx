@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import Container from "@/components/Container";
+import Logo from "@/components/brand/Logo";
 import PageLoader from "@/components/PageLoader";
 import { useAuth } from "@/context/AuthContext";
-import { SITE } from "@/lib/pricing";
 
 function LoginContent() {
   const router = useRouter();
@@ -42,28 +42,20 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-brand-surface">
       <Container className="flex min-h-screen items-center justify-center py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <Link href="/" className="inline-flex items-center gap-2 font-bold text-slate-900">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white text-sm">
-                CT
-              </span>
-              <span>
-                {SITE.name}
-                <span className="text-blue-600">.it</span>
-              </span>
-            </Link>
-            <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-900">
+            <Logo size="lg" href="/" className="justify-center" />
+            <h1 className="display-heading mt-6 text-3xl">
               Accedi al tuo account
             </h1>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-brand-muted">
               Usa le credenziali ricevute via email dopo l&apos;acquisto.
             </p>
           </div>
 
-          <form className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4" onSubmit={handleSubmit}>
+          <form className="card-surface p-6 space-y-4" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
                 Email
@@ -75,7 +67,7 @@ function LoginContent() {
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                className="w-full rounded-xl border border-brand-border bg-brand-surface px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent"
                 placeholder="nome@email.it"
               />
             </div>
@@ -91,7 +83,7 @@ function LoginContent() {
                 required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                className="w-full rounded-xl border border-brand-border bg-brand-surface px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent"
                 placeholder="La tua password"
               />
             </div>
@@ -101,7 +93,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+              className="btn-accent w-full disabled:opacity-60"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -116,7 +108,7 @@ function LoginContent() {
 
           <p className="text-center text-sm text-slate-600">
             Non hai ancora un account?{" "}
-            <Link href="/prezzi" className="font-semibold text-blue-600 hover:text-blue-700">
+            <Link href="/prezzi" className="font-semibold text-brand-accent hover:text-brand-accent-hover">
               Acquista un pacchetto report
             </Link>
           </p>

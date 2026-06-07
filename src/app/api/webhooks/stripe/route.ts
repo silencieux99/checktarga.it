@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
 import { fulfillPackOrder, resolveOrderIdFromPaymentIntent } from "@/lib/order-fulfillment";
+import {
+  fulfillSubscriptionRenewal,
+  syncSubscriptionStatus,
+} from "@/lib/subscription-service";
 import { sendTelegramErrorNotification } from "@/lib/telegram-notification-service";
 import Stripe from "stripe";
 
@@ -109,6 +113,13 @@ export async function POST(req: NextRequest) {
         break;
       case "payment_intent.succeeded":
         await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent);
+        break;
+      case "invoice.paid":
+        await fulfillSubscriptionRenewal(event.data.object as Stripe.Invoice);
+        break;
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted":
+        await syncSubscriptionStatus(event.data.object as Stripe.Subscription);
         break;
       case "payment_intent.payment_failed": {
         const failedIntent = event.data.object as Stripe.PaymentIntent;

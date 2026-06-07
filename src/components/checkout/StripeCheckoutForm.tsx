@@ -19,9 +19,16 @@ interface StripeCheckoutFormProps {
   orderId: string;
   email: string;
   amountLabel: string;
+  isSubscription?: boolean;
 }
 
-function PaymentForm({ clientSecret, orderId, email, amountLabel }: StripeCheckoutFormProps) {
+function PaymentForm({
+  clientSecret,
+  orderId,
+  email,
+  amountLabel,
+  isSubscription = false,
+}: StripeCheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,7 +83,7 @@ function PaymentForm({ clientSecret, orderId, email, amountLabel }: StripeChecko
       <button
         type="submit"
         disabled={!stripe || !elements || isSubmitting}
-        className="w-full rounded-xl bg-teal-700 py-3.5 text-white font-semibold hover:bg-teal-800 disabled:opacity-60 inline-flex items-center justify-center gap-2"
+        className="btn-accent w-full disabled:opacity-60"
       >
         {isSubmitting ? (
           <>
@@ -92,7 +99,9 @@ function PaymentForm({ clientSecret, orderId, email, amountLabel }: StripeChecko
       </button>
 
       <p className="text-xs text-slate-500 text-center">
-        Pagamento elaborato da Stripe. I dati della carta non transitano sui nostri server.
+        {isSubscription
+          ? "Confermando il pagamento autorizzi il salvataggio sicuro della carta tramite Stripe per il rinnovo automatico dopo 48 ore. Puoi annullare dall'area personale."
+          : "Pagamento elaborato da Stripe. I dati della carta non transitano sui nostri server."}
       </p>
     </form>
   );
@@ -115,7 +124,7 @@ export default function StripeCheckoutForm(props: StripeCheckoutFormProps) {
         appearance: {
           theme: "stripe",
           variables: {
-            colorPrimary: "#0f766e",
+            colorPrimary: "#059669",
             colorText: "#0f172a",
             borderRadius: "12px",
           },

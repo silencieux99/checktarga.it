@@ -86,7 +86,7 @@ export function ReportPreviewHero({ query, startingFromPrice, onScrollToPricing 
               A partire da{" "}
               <span className="font-medium tabular-nums text-slate-900">{startingFromPrice}</span>
               <span className="mx-2 text-slate-300">·</span>
-              pagamento unico, senza abbonamento
+              offerta introduttiva, poi abbonamento ogni 4 settimane
             </p>
           </div>
         </div>

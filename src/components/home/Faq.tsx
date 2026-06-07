@@ -26,9 +26,9 @@ const FAQS = [
       "Se il report non contiene dati utili rispetto a quanto promesso, puoi contattarci entro 30 giorni per una verifica del rimborso.",
   },
   {
-    question: "Serve un abbonamento?",
+    question: "Come funziona l'abbonamento?",
     answer:
-      "No. Acquisti un pacchetto di crediti una tantum. Nessun rinnovo automatico.",
+      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 48 ore parte il rinnovo automatico ogni 4 settimane (29,99 € o 39,99 €) sulla carta salvata in sicurezza tramite Stripe. Puoi annullare in qualsiasi momento dall'area personale.",
   },
   {
     question: "Il pagamento è sicuro?",

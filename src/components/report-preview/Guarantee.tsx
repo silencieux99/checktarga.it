@@ -22,7 +22,7 @@ const GUARANTEES = [
   {
     no: "05",
     title: "Nessun abbonamento",
-    desc: "Pagamento unico. Nessun rinnovo automatico.",
+    desc: "Offerta introduttiva, poi rinnovo ogni 4 settimane cancellabile.",
   },
   {
     no: "06",

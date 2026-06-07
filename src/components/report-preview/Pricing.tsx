@@ -1,6 +1,11 @@
 "use client";
 
-import { PRICING_PLANS, PricingPlan, formatPrice } from "@/lib/pricing";
+import {
+  PricingPlan,
+  formatPrice,
+  formatSubscriptionIntroLabel,
+  getVisiblePricingPlans,
+} from "@/lib/pricing";
 
 interface Props {
   vehicleValue: string;
@@ -49,7 +54,7 @@ function PlanRow({
         </div>
         <div className="flex-shrink-0 text-right">
           <p className="text-[20px] font-light leading-none tracking-tight text-slate-900 tabular-nums lg:text-[22px]">
-            {formatPrice(plan.price)}
+            {plan.subscription ? formatSubscriptionIntroLabel(plan) : formatPrice(plan.price)}
           </p>
           {savePct > 0 && (
             <span className="mt-1.5 block text-[10px] font-medium tabular-nums text-emerald-700">
@@ -63,9 +68,10 @@ function PlanRow({
 }
 
 export function ReportPreviewPricing({ vehicleValue, onCheckout }: Props) {
-  const featured = PRICING_PLANS.find((p) => p.highlight) ?? PRICING_PLANS[0];
-  const others = PRICING_PLANS.filter((p) => p.sku !== featured.sku);
-  const singlePlan = PRICING_PLANS.find((p) => p.sku === "pack1");
+  const plans = getVisiblePricingPlans();
+  const featured = plans.find((p) => p.highlight) ?? plans[0];
+  const others = plans.filter((p) => p.sku !== featured.sku);
+  const singlePlan = plans.find((p) => p.sku === "pack1");
   const baseUnit = singlePlan?.price ?? featured.price;
   const featuredUnit = featured.price / Math.max(featured.reports, 1);
   const featuredSave =
@@ -77,7 +83,7 @@ export function ReportPreviewPricing({ vehicleValue, onCheckout }: Props) {
         <div className="mb-12 flex flex-col gap-8 lg:mb-20 lg:flex-row lg:items-end lg:justify-between lg:gap-20">
           <div className="min-w-0 flex-1 lg:max-w-2xl">
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.22em] text-slate-400">
-              Prezzi · Pagamento unico
+              Prezzi · Offerta introduttiva
             </p>
             <h2 className="text-balance text-[32px] font-light leading-[1.05] tracking-[-0.02em] text-slate-950 sm:text-[40px] lg:text-[56px]">
               Il report che ogni acquirente{" "}
@@ -85,12 +91,8 @@ export function ReportPreviewPricing({ vehicleValue, onCheckout }: Props) {
             </h2>
           </div>
           <div className="lg:w-[340px] lg:flex-shrink-0 lg:border-l lg:border-slate-200/80 lg:pl-10">
-            <p className="text-[14px] leading-relaxed text-slate-500 md:text-[15px]">
-              Scegli la formula giusta. Nessun rinnovo automatico. Dati disponibili pochi secondi
-              dopo il pagamento.
-              <span className="mt-3 block text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                Per <span className="font-medium text-slate-900">{vehicleValue.toUpperCase()}</span>
-              </span>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
+              Per <span className="font-medium text-slate-900">{vehicleValue.toUpperCase()}</span>
             </p>
           </div>
         </div>

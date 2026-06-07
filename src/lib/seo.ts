@@ -20,7 +20,7 @@ export const SEO = {
     "CheckTarga",
   ],
   locale: "it_IT",
-  themeColor: "#2563eb",
+  themeColor: "#0f172a",
 } as const;
 
 export const PUBLIC_ROUTES = [

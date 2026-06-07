@@ -16,7 +16,7 @@ const FAQ_ITEMS = [
   {
     question: "Serve un abbonamento?",
     answer:
-      "No. Acquisti un pacchetto di crediti una tantum tramite Stripe, senza rinnovo automatico.",
+      "Paghi un importo introduttivo e ricevi subito i crediti. Dopo 48 ore parte il rinnovo automatico ogni 4 settimane sulla carta salvata tramite Stripe. Puoi annullare dall'area personale.",
   },
   {
     question: "Quanto tempo ci vuole?",
