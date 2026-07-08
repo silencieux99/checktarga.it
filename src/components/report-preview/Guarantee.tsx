@@ -21,8 +21,8 @@ const GUARANTEES = [
   },
   {
     no: "05",
-    title: "Nessun abbonamento",
-    desc: "Offerta introduttiva, poi rinnovo ogni 4 settimane cancellabile.",
+    title: "Abbonamento trasparente",
+    desc: "Offerta introduttiva, poi rinnovo mensile dopo 3 giorni, cancellabile in qualsiasi momento.",
   },
   {
     no: "06",

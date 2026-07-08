@@ -1,6 +1,5 @@
 import {
   formatPrice,
-  formatSubscriptionBillingPeriod,
   getSubscriptionTerms,
   type PricingPlan,
 } from "@/lib/pricing";
@@ -17,6 +16,7 @@ export default function SubscriptionTerms({
   if (!plan.subscription) return null;
 
   const { introPrice, recurringPrice, trialHours, recurringCredits } = plan.subscription;
+  const trialDays = Math.round(trialHours / 24);
 
   if (variant === "compact") {
     return (
@@ -34,9 +34,9 @@ export default function SubscriptionTerms({
           salvata in modo sicuro tramite Stripe.
         </p>
         <p>
-          <span className="font-semibold text-slate-500">Rinnovo automatico.</span> Tra {trialHours}{" "}
-          ore: {formatPrice(recurringPrice)} {formatSubscriptionBillingPeriod(plan.subscription)} con{" "}
-          {recurringCredits} nuovo{recurringCredits > 1 ? "i" : ""} credito
+          <span className="font-semibold text-slate-500">Rinnovo automatico.</span> Dopo{" "}
+          {trialDays} giorni: {formatPrice(recurringPrice)}/mese con {recurringCredits} nuovo
+          {recurringCredits > 1 ? "i" : ""} credito
           {recurringCredits > 1 ? "i" : ""}. L&apos;addebito avviene automaticamente sulla carta
           salvata.
         </p>
@@ -62,8 +62,7 @@ export default function SubscriptionTerms({
       <div>
         <p className="text-sm font-semibold text-slate-900">Rinnovo automatico</p>
         <p className="text-sm text-slate-600">
-          Tra {trialHours} ore: {formatPrice(recurringPrice)}{" "}
-          {formatSubscriptionBillingPeriod(plan.subscription)} con {recurringCredits} nuovo
+          Dopo {trialDays} giorni: {formatPrice(recurringPrice)}/mese con {recurringCredits} nuovo
           {recurringCredits > 1 ? "i" : ""} credito{recurringCredits > 1 ? "i" : ""}. L&apos;addebito
           avviene automaticamente sulla carta salvata.
         </p>

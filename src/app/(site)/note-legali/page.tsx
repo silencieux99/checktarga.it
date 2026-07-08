@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
 import { buildPageMetadata } from "@/lib/seo";
+import { SITE } from "@/lib/pricing";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Note legali",
@@ -12,7 +13,7 @@ export default function NoteLegaliPage() {
   return (
     <LegalLayout title="Note legali">
       <p>
-        Editor del sito: CheckTarga.it — contatto: contact@checktarga.it
+        Editor del sito: CheckTarga.it — contatto: {SITE.supportEmail}
       </p>
       <p>
         Hosting: Vercel Inc. Pagamenti: Stripe Payments Europe Ltd.

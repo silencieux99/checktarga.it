@@ -80,13 +80,13 @@ export function ReportPreviewHero({ query, startingFromPrice, onScrollToPricing 
               onClick={onScrollToPricing}
               className="inline-flex items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-[14px] font-medium tracking-wide text-white transition-colors hover:bg-slate-800"
             >
-              Vedi il report completo
+              Vedi il report basato sui dati disponibili
             </button>
             <p className="text-[13px] text-slate-500">
               A partire da{" "}
               <span className="font-medium tabular-nums text-slate-900">{startingFromPrice}</span>
               <span className="mx-2 text-slate-300">·</span>
-              offerta introduttiva, poi abbonamento ogni 4 settimane
+              offerta introduttiva, poi abbonamento mensile dopo 3 giorni
             </p>
           </div>
         </div>

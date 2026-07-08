@@ -5,7 +5,7 @@ import { buildPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildPageMetadata({
   title: "Prezzi",
   description:
-    "Offerta introduttiva da 4,99 € con rinnovo ogni 4 settimane dopo 48 ore. Verifica targa o VIN in Italia.",
+    "Offerta introduttiva da 4,99 € con rinnovo mensile dopo 3 giorni. Verifica targa o VIN in Italia.",
   path: "/prezzi",
 });
 
@@ -19,8 +19,8 @@ export default function PrezziPage() {
             Scegli il piano giusto per te
           </h1>
           <p className="mt-4 text-brand-muted">
-            Paghi un importo ridotto oggi e ricevi subito i crediti. Il rinnovo ogni 4 settimane parte
-            automaticamente dopo 48 ore. Annulla in qualsiasi momento dall&apos;area personale.
+            Paghi un importo ridotto oggi e ricevi subito i crediti. Il rinnovo mensile parte
+            automaticamente dopo 3 giorni. Annulla in qualsiasi momento dall&apos;area personale.
           </p>
         </div>
 
@@ -30,7 +30,7 @@ export default function PrezziPage() {
           <p className="font-semibold text-brand">Come funziona l&apos;abbonamento</p>
           <ul className="mt-3 space-y-2">
             <li>• Pagamento iniziale: 4,99 € (1 report) o 6,99 € (5 report).</li>
-            <li>• Dopo 48 ore: rinnovo automatico ogni 4 settimane a 29,99 € o 39,99 €.</li>
+            <li>• Dopo 3 giorni: rinnovo automatico mensile a 29,99 € o 39,99 €.</li>
             <li>• Ogni rinnovo aggiunge nuovi crediti al tuo account.</li>
             <li>• Cancellazione possibile prima del prossimo addebito.</li>
           </ul>

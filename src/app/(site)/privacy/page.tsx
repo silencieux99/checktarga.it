@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
 import { buildPageMetadata } from "@/lib/seo";
+import { SITE } from "@/lib/pricing";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Informativa privacy",
@@ -17,7 +18,7 @@ export default function PrivacyPage() {
       </p>
       <p>
         I dati sono conservati su infrastrutture cloud con accesso limitato al personale autorizzato.
-        Puoi richiedere accesso, rettifica o cancellazione scrivendo a contact@checktarga.it.
+        Puoi richiedere accesso, rettifica o cancellazione scrivendo a {SITE.supportEmail}.
       </p>
     </LegalLayout>
   );

@@ -68,6 +68,12 @@ export default function ReportPreviewView() {
         onScrollToPricing={scrollToPricing}
       />
 
+      <div className="mx-auto max-w-6xl px-5 md:px-10">
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-700 md:mt-8">
+          Le informazioni disponibili possono variare in base al veicolo e alle fonti consultabili.
+        </div>
+      </div>
+
       <ReportPreviewKeyData query={query} onUnlock={scrollToPricing} />
 
       <section className="border-t border-slate-200/80 bg-white">

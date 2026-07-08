@@ -21,7 +21,7 @@ export const HERO = {
   title: "Lo storico della tua auto.",
   titleAccent: "Un clic e basta.",
   subtitle:
-    "Proteggiti da truffe, chilometri alterati e veicoli con problemi nascosti scoprendo la storia completa prima di acquistare.",
+    "Proteggiti da truffe, chilometri alterati e veicoli con problemi nascosti scoprendo lo storico disponibile prima di acquistare.",
   cta: "Verifica veicolo",
   trust: ["Dati aggiornati ogni giorno", "Pagamento sicuro Stripe", "Garanzia soddisfatti o rimborsati"],
 };
@@ -30,7 +30,7 @@ export const FEATURES = {
   label: "Come possiamo aiutarti",
   title: "Tutto ciò che devi sapere, prima di firmare.",
   subtitle:
-    "Da chilometraggio e manutenzione a furti e sinistri, ti mostriamo la storia completa del veicolo.",
+    "Da chilometraggio e manutenzione a furti e sinistri, ti mostriamo lo storico disponibile del veicolo.",
   items: [
     {
       title: "Storico chilometri",
@@ -148,8 +148,8 @@ export const PRICING_TEASER = {
   label: "Prezzi trasparenti",
   title: "Il tuo report è a pochi clic di distanza.",
   subtitle:
-    "Offerta introduttiva da 4,99 € con rinnovo ogni 4 settimane dopo 48 ore. Ogni piano include report completo, crediti periodici e garanzia 14 giorni.",
-  benefits: ["Report veicolo completo", "Crediti mensili inclusi", "Garanzia 14 giorni"],
+    "Offerta introduttiva da 4,99 € con rinnovo mensile dopo 3 giorni. Ogni piano include report basato sui dati disponibili, crediti periodici e garanzia 14 giorni.",
+  benefits: ["Report basato sui dati disponibili", "Crediti mensili inclusi", "Garanzia 14 giorni"],
   cta: "Scegli il piano",
 };
 
@@ -172,7 +172,7 @@ export const FAQ_ITEMS = [
   {
     question: "Come funziona l'abbonamento?",
     answer:
-      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 48 ore parte il rinnovo automatico ogni 4 settimane sulla carta salvata. Puoi annullare in qualsiasi momento dall'area personale.",
+      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 3 giorni parte il rinnovo automatico mensile sulla carta salvata. Puoi annullare in qualsiasi momento dall'area personale.",
   },
   {
     question: "Quali metodi di pagamento accettate?",
@@ -219,6 +219,8 @@ export const FOOTER_COLUMNS = [
       { label: "Prezzi", href: "/prezzi" },
       { label: "Esempio report", href: "/esempio-report" },
       { label: "Blog", href: "/blog" },
+      { label: "Abbonamento", href: "/abbonamento" },
+      { label: "Disdetta", href: "/disdetta" },
     ],
   },
   {
@@ -232,9 +234,10 @@ export const FOOTER_COLUMNS = [
   {
     title: "Legale",
     links: [
-      { label: "Termini", href: "/termini" },
+      { label: "Condizioni generali", href: "/termini" },
       { label: "Privacy", href: "/privacy" },
       { label: "Note legali", href: "/note-legali" },
+      { label: "Rimborso", href: "/rimborso" },
     ],
   },
 ];

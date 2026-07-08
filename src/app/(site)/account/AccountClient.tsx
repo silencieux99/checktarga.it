@@ -209,7 +209,7 @@ export default function AccountClient() {
                 </div>
 
                 <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-300">
-                  Inserisci una targa italiana o un VIN per ottenere lo storico completo del
+                  Inserisci una targa italiana o un VIN per ottenere lo storico disponibile del
                   veicolo in pochi secondi.
                 </p>
 

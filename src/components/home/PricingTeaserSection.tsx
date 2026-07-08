@@ -33,7 +33,7 @@ export default function PricingTeaserSection() {
               4,99 €
               <span className="ml-2 text-lg text-slate-400">oggi</span>
             </p>
-            <p className="mt-4 text-slate-400">poi 29,99 € ogni 4 settimane dopo 48 ore</p>
+            <p className="mt-4 text-slate-400">poi 29,99 €/mese dopo 3 giorni</p>
             <div className="mt-8 space-y-3 border-t border-white/10 pt-8 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-400">Sinistri</span>

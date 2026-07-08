@@ -56,7 +56,7 @@ function BlurredCard({
             onClick={onUnlock}
             className="pointer-events-auto rounded-xl bg-slate-900 px-7 py-4 text-sm font-semibold text-white shadow-2xl shadow-slate-900/30 transition-all hover:bg-black active:scale-95"
           >
-            Vedi il report completo
+            Vedi il report basato sui dati disponibili
           </button>
         </div>
       </div>

@@ -20,6 +20,11 @@ interface StripeCheckoutFormProps {
   email: string;
   amountLabel: string;
   isSubscription?: boolean;
+  subscriptionConsent?: {
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    error?: boolean;
+  };
 }
 
 function PaymentForm({
@@ -28,6 +33,7 @@ function PaymentForm({
   email,
   amountLabel,
   isSubscription = false,
+  subscriptionConsent,
 }: StripeCheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
@@ -80,9 +86,36 @@ function PaymentForm({
         </div>
       )}
 
+      {isSubscription && subscriptionConsent && (
+        <label
+          className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${
+            subscriptionConsent.error
+              ? "border-red-200 bg-red-50"
+              : "border-slate-200 bg-slate-50 hover:border-slate-300"
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={subscriptionConsent.checked}
+            onChange={(e) => subscriptionConsent.onCheckedChange(e.target.checked)}
+            disabled={isSubmitting}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-accent focus:ring-brand-accent/30"
+          />
+          <span className="text-sm leading-relaxed text-slate-700">
+            Confermo di aver letto e accettato che dopo 3 giorni il servizio si rinnova automaticamente
+            a 29,99 €/mese, salvo disdetta.
+          </span>
+        </label>
+      )}
+
       <button
         type="submit"
-        disabled={!stripe || !elements || isSubmitting}
+        disabled={
+          !stripe ||
+          !elements ||
+          isSubmitting ||
+          (isSubscription && subscriptionConsent ? !subscriptionConsent.checked : false)
+        }
         className="btn-accent w-full disabled:opacity-60"
       >
         {isSubmitting ? (
@@ -93,14 +126,20 @@ function PaymentForm({
         ) : (
           <>
             <Lock className="w-4 h-4" />
-            Paga {amountLabel}
+            {isSubscription ? `Paga ${amountLabel} oggi` : `Paga ${amountLabel}`}
           </>
         )}
       </button>
 
+      {isSubscription && (
+        <p className="text-sm text-slate-700 text-center">
+          Poi 29,99 €/mese dopo 3 giorni, con rinnovo automatico. Annullabile in qualsiasi momento.
+        </p>
+      )}
+
       <p className="text-xs text-slate-500 text-center">
         {isSubscription
-          ? "Confermando il pagamento autorizzi il salvataggio sicuro della carta tramite Stripe per il rinnovo automatico dopo 48 ore. Puoi annullare dall'area personale."
+          ? "Confermando il pagamento autorizzi il salvataggio sicuro della carta tramite Stripe per il rinnovo automatico dopo 3 giorni. Puoi annullare dall'area personale."
           : "Pagamento elaborato da Stripe. I dati della carta non transitano sui nostri server."}
       </p>
     </form>

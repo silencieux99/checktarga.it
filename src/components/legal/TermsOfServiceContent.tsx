@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE, SUBSCRIPTION_BILLING_INTERVAL_COUNT, SUBSCRIPTION_TRIAL_HOURS } from "@/lib/pricing";
+import { SITE, SUBSCRIPTION_TRIAL_HOURS } from "@/lib/pricing";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -41,7 +41,7 @@ export default function TermsOfServiceContent() {
         </Sub>
         <Sub title="1.2. Finalità">
           <p>
-            Il nostro obiettivo è fornire report completi e accurati sullo storico dei veicoli (i
+            Il nostro obiettivo è fornire report basati sui dati disponibili sullo storico dei veicoli (i
             &quot;Report&quot;) per aiutarti a prendere decisioni informate nell&apos;acquisto o
             nella valutazione di un veicolo immatricolato in Italia o ricercato tramite targa o VIN.
           </p>
@@ -197,15 +197,21 @@ export default function TermsOfServiceContent() {
             <strong>Piano 1 Report — Offerta introduttiva</strong>
           </p>
           <ul className="list-disc space-y-1 pl-5">
-            <li>Prezzo iniziale: 4,99 € (pagamento una tantum all&apos;attivazione)</li>
+            <li>Oggi paghi: 4,99 €</li>
             <li>Crediti immediati: 1 Report</li>
             <li>
-              Periodo iniziale: accesso ai Servizi e addebito della carta salvata tramite Stripe
+              Include: 1 report immediato
             </li>
             <li>
-              Dopo {SUBSCRIPTION_TRIAL_HOURS} ore dall&apos;acquisto iniziale: rinnovo automatico a
-              29,99 € ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane con 1 nuovo credito per
-              ciclo
+              Dopo 3 giorni: abbonamento mensile a 29,99 €/mese
+            </li>
+            <li>Rinnovo automatico fino alla disdetta</li>
+            <li>
+              Puoi annullare in qualsiasi momento dal tuo account (vedi{" "}
+              <Link href="/disdetta" className="text-brand-accent underline underline-offset-2">
+                Disdetta
+              </Link>
+              ).
             </li>
           </ul>
 
@@ -213,12 +219,18 @@ export default function TermsOfServiceContent() {
             <strong>Piano 5 Report — Offerta introduttiva</strong>
           </p>
           <ul className="list-disc space-y-1 pl-5">
-            <li>Prezzo iniziale: 6,99 € (pagamento una tantum all&apos;attivazione)</li>
+            <li>Oggi paghi: 6,99 €</li>
             <li>Crediti immediati: 5 Report</li>
             <li>
-              Dopo {SUBSCRIPTION_TRIAL_HOURS} ore dall&apos;acquisto iniziale: rinnovo automatico a
-              39,99 € ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane con 5 nuovi crediti per
-              ciclo
+              Dopo 3 giorni: abbonamento mensile a 39,99 €/mese
+            </li>
+            <li>Rinnovo automatico fino alla disdetta</li>
+            <li>
+              Puoi annullare in qualsiasi momento dal tuo account (vedi{" "}
+              <Link href="/disdetta" className="text-brand-accent underline underline-offset-2">
+                Disdetta
+              </Link>
+              ).
             </li>
           </ul>
 
@@ -228,11 +240,18 @@ export default function TermsOfServiceContent() {
           <p>
             L&apos;abbonamento inizia con il pagamento dell&apos;offerta introduttiva. Al momento del
             checkout, la carta di pagamento viene salvata in modo sicuro tramite Stripe per
-            consentire i rinnovi automatici. Trascorse {SUBSCRIPTION_TRIAL_HOURS} ore dal primo
-            pagamento, l&apos;abbonamento si rinnova automaticamente al prezzo ricorrente indicato
-            sopra, ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane, fino a disdetta. Puoi
-            annullare in qualsiasi momento dall&apos;area personale o contattando il supporto prima
-            del prossimo addebito.
+            consentire i rinnovi automatici. Trascorsi 3 giorni dal primo pagamento, l&apos;abbonamento
+            si rinnova automaticamente al prezzo ricorrente indicato sopra, con rinnovo mensile fino a
+            disdetta. Puoi annullare in qualsiasi momento dall&apos;area personale o contattando il
+            supporto prima del prossimo addebito. Per dettagli, consulta{" "}
+            <Link href="/abbonamento" className="text-brand-accent underline underline-offset-2">
+              Abbonamento
+            </Link>{" "}
+            e{" "}
+            <Link href="/disdetta" className="text-brand-accent underline underline-offset-2">
+              Disdetta
+            </Link>
+            .
           </p>
         </Sub>
 
@@ -282,6 +301,13 @@ export default function TermsOfServiceContent() {
             <a href={`mailto:${SITE.supportEmail}`} className="text-brand-accent underline">
               {SITE.supportEmail}
             </a>
+            .
+          </p>
+          <p>
+            Per le istruzioni passo-passo, visita{" "}
+            <Link href="/disdetta" className="text-brand-accent underline underline-offset-2">
+              Disdetta
+            </Link>
             .
           </p>
         </Sub>
@@ -486,6 +512,9 @@ export default function TermsOfServiceContent() {
             </a>
           </li>
         </ul>
+        <p className="mt-4 text-slate-700">
+          Le informazioni disponibili possono variare in base al veicolo e alle fonti consultabili.
+        </p>
         <p className="mt-6 text-slate-700">
           Utilizzando {SITE.domain}, accetti le presenti Condizioni e le policy correlate. Grazie per
           aver scelto {SITE.name} — siamo felici di aiutarti a prendere decisioni più consapevoli

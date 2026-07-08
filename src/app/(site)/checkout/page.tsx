@@ -26,6 +26,7 @@ function CheckoutContent() {
   const [emailError, setEmailError] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState(false);
+  const [acceptedSubscriptionRenewal, setAcceptedSubscriptionRenewal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"email" | "payment">("email");
@@ -171,7 +172,7 @@ function CheckoutContent() {
                   className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-accent focus:ring-brand-accent/30"
                 />
                 <span className="text-sm leading-relaxed text-slate-600">
-                  Ho letto e accetto i{" "}
+                  Ho letto e accetto le{" "}
                   <Link
                     href="/termini"
                     target="_blank"
@@ -179,7 +180,7 @@ function CheckoutContent() {
                     className="font-medium text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    Termini e condizioni
+                    Condizioni generali di vendita
                   </Link>{" "}
                   e l&apos;{" "}
                   <Link
@@ -222,6 +223,34 @@ function CheckoutContent() {
                 <span className="font-medium">Email:</span> {email}
               </div>
 
+              {subscriptionPlan && (
+                <div className="rounded-2xl border-2 border-slate-900 bg-white p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-base font-bold text-slate-950">Riepilogo dell’offerta</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-950">
+                        Oggi paghi: {formatPrice(subscriptionPlan.subscription.introPrice)}
+                      </p>
+                    </div>
+                    <Link
+                      href="/abbonamento"
+                      className="text-sm font-semibold text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
+                    >
+                      Dettagli abbonamento
+                    </Link>
+                  </div>
+                  <div className="mt-3 space-y-1.5 text-sm text-slate-900">
+                    <p>Include: 1 report immediato</p>
+                    <p>
+                      Dopo 3 giorni: abbonamento mensile a{" "}
+                      {formatPrice(subscriptionPlan.subscription.recurringPrice)}/mese
+                    </p>
+                    <p>Rinnovo automatico fino alla disdetta</p>
+                    <p>Puoi annullare in qualsiasi momento dal tuo account</p>
+                  </div>
+                </div>
+              )}
+
               {clientSecret && orderId && (
                 <StripeCheckoutForm
                   clientSecret={clientSecret}
@@ -229,6 +258,16 @@ function CheckoutContent() {
                   email={email}
                   amountLabel={amountLabel}
                   isSubscription={Boolean(subscriptionPlan)}
+                  subscriptionConsent={
+                    subscriptionPlan
+                      ? {
+                          checked: acceptedSubscriptionRenewal,
+                          onCheckedChange: (checked) => {
+                            setAcceptedSubscriptionRenewal(checked);
+                          },
+                        }
+                      : undefined
+                  }
                 />
               )}
 

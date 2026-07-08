@@ -27,7 +27,7 @@ export function PostPaymentProcess() {
           {
             n: "3",
             title: "Accesso immediato",
-            text: "Consulta il report completo in meno di 30 secondi.",
+            text: "Consulta il report basato sui dati disponibili in meno di 30 secondi.",
           },
         ].map((step, idx) => (
           <div key={step.title} className="flex flex-row items-start gap-6 md:flex-col md:items-center md:text-center">

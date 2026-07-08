@@ -28,7 +28,7 @@ const FAQS = [
   {
     question: "Come funziona l'abbonamento?",
     answer:
-      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 48 ore parte il rinnovo automatico ogni 4 settimane (29,99 € o 39,99 €) sulla carta salvata in sicurezza tramite Stripe. Puoi annullare in qualsiasi momento dall'area personale.",
+      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 3 giorni parte il rinnovo automatico mensile (29,99 € o 39,99 €) sulla carta salvata in sicurezza tramite Stripe. Puoi annullare in qualsiasi momento dall'area personale.",
   },
   {
     question: "Il pagamento è sicuro?",

@@ -11,15 +11,22 @@ export default function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Logo size="lg" variant="inverse" href="/" />
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-400">
-              Servizio indipendente di verifica storico veicoli in Italia. Trasparenza prima
-              dell&apos;acquisto.
-            </p>
+            <div className="mt-4 max-w-sm space-y-2 text-sm leading-relaxed text-white/90">
+              <p className="font-semibold text-white">VisuraVeicolo.it</p>
+              <p>Servizio privato e indipendente</p>
+              <p className="text-white/80">
+                Non affiliato ad ACI, PRA, Motorizzazione Civile o enti pubblici
+              </p>
+              <p className="text-white/80">
+                Le informazioni disponibili possono variare in base al veicolo e alle fonti consultabili.
+              </p>
+              <p className="text-white/80">BILL XIX LIMITED</p>
+            </div>
             <a
               href={`mailto:${SITE.supportEmail}`}
-              className="mt-4 inline-block text-sm text-brand-accent hover:text-emerald-400"
+              className="mt-4 inline-block text-sm font-semibold text-brand-accent hover:text-emerald-400"
             >
-              {SITE.supportEmail}
+              Support: {SITE.supportEmail}
             </a>
           </div>
 
@@ -31,7 +38,7 @@ export default function SiteFooter() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-slate-400 transition-colors hover:text-white"
+                      className="text-sm text-white/80 transition-colors hover:text-white"
                     >
                       {link.label}
                     </Link>
