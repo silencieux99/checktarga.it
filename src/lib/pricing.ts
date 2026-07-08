@@ -14,7 +14,7 @@ export interface SubscriptionConfig {
   introPrice: number;
   recurringPrice: number;
   trialHours: number;
-  interval: "week";
+  interval: "week" | "month";
   intervalCount: number;
   recurringCredits: number;
 }
