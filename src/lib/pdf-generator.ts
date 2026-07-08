@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import type { AIVerification, ReportSection, VehicleReportInfo } from "@/types/report.types";
+import { COMPANY } from "@/lib/company";
 import { SITE } from "@/lib/pricing";
 
 interface PDFGeneratorOptions {
@@ -240,15 +241,21 @@ export async function generateProfessionalPDF(options: PDFGeneratorOptions): Pro
   setColor(colors.textLight);
   doc.setFont("helvetica", "normal");
   doc.text(
-    `Report generato da ${SITE.domain} — Documento confidenziale`,
+    `Report generato da ${SITE.domain} — ${COMPANY.legalName}`,
     pageWidth / 2,
     footerY,
     { align: "center" }
   );
   doc.text(
-    "Le informazioni contenute in questo report sono fornite a titolo indicativo.",
+    "Servizio privato e indipendente. Le informazioni sono fornite a titolo indicativo.",
     pageWidth / 2,
     footerY + 4,
+    { align: "center" }
+  );
+  doc.text(
+    "Le informazioni disponibili possono variare in base al veicolo e alle fonti consultabili.",
+    pageWidth / 2,
+    footerY + 8,
     { align: "center" }
   );
 

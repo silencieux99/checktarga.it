@@ -1,6 +1,5 @@
-"use client";
-
 import Container from "@/components/Container";
+import LegalCompanyBlock from "@/components/legal/LegalCompanyBlock";
 import { SITE } from "@/lib/pricing";
 
 export default function RimborsoPage() {
@@ -16,19 +15,29 @@ export default function RimborsoPage() {
             contattarci per assistenza e valutare la possibilità di rimborso in base alle condizioni
             applicabili.
           </p>
-          <p className="mt-4 text-base text-slate-700">
-            Per supporto scrivi a{" "}
-            <a
-              href={`mailto:${SITE.supportEmail}`}
-              className="font-semibold text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
-            >
-              {SITE.supportEmail}
-            </a>
-            .
-          </p>
+
+          <div className="mt-8">
+            <LegalCompanyBlock />
+          </div>
+
+          <div className="mt-8 space-y-4 text-base text-slate-700">
+            <p>
+              Se un report non contiene dati utili rispetto a quanto ragionevolmente atteso per il
+              veicolo cercato, puoi contattarci entro 30 giorni per una verifica.
+            </p>
+            <p>
+              Per supporto scrivi a{" "}
+              <a
+                href={`mailto:${SITE.supportEmail}`}
+                className="font-semibold text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
+              >
+                {SITE.supportEmail}
+              </a>
+              .
+            </p>
+          </div>
         </div>
       </Container>
     </div>
   );
 }
-

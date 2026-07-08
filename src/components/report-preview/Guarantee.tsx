@@ -1,8 +1,8 @@
 const GUARANTEES = [
   {
     no: "01",
-    title: "Fonti ufficiali",
-    desc: "PRA, revisioni, banche dati europee e partner certificati incrociati.",
+    title: "Fonti certificate",
+    desc: "Banche dati, revisioni, partner certificati e fonti consultabili incrociate.",
   },
   {
     no: "02",
@@ -22,7 +22,7 @@ const GUARANTEES = [
   {
     no: "05",
     title: "Abbonamento trasparente",
-    desc: "Offerta introduttiva, poi rinnovo mensile dopo 3 giorni, cancellabile in qualsiasi momento.",
+    desc: "Offerta introduttiva, poi rinnovo ogni 4 settimane dopo 48 ore, cancellabile in qualsiasi momento.",
   },
   {
     no: "06",

@@ -9,6 +9,10 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
+import {
+  SUBSCRIPTION_CONSENT_CHECKBOX_LABEL,
+  SUBSCRIPTION_PRE_PAYMENT_NOTICE,
+} from "@/lib/company";
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
@@ -86,6 +90,12 @@ function PaymentForm({
         </div>
       )}
 
+      {isSubscription && (
+        <div className="rounded-2xl border-2 border-slate-900 bg-white p-4 text-sm font-medium leading-relaxed text-slate-900">
+          {SUBSCRIPTION_PRE_PAYMENT_NOTICE}
+        </div>
+      )}
+
       {isSubscription && subscriptionConsent && (
         <label
           className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${
@@ -102,8 +112,7 @@ function PaymentForm({
             className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-accent focus:ring-brand-accent/30"
           />
           <span className="text-sm leading-relaxed text-slate-700">
-            Confermo di aver letto e accettato che dopo 3 giorni il servizio si rinnova automaticamente
-            a 29,99 €/mese, salvo disdetta.
+            {SUBSCRIPTION_CONSENT_CHECKBOX_LABEL}
           </span>
         </label>
       )}
@@ -131,15 +140,9 @@ function PaymentForm({
         )}
       </button>
 
-      {isSubscription && (
-        <p className="text-sm text-slate-700 text-center">
-          Poi 29,99 €/mese dopo 3 giorni, con rinnovo automatico. Annullabile in qualsiasi momento.
-        </p>
-      )}
-
       <p className="text-xs text-slate-500 text-center">
         {isSubscription
-          ? "Confermando il pagamento autorizzi il salvataggio sicuro della carta tramite Stripe per il rinnovo automatico dopo 3 giorni. Puoi annullare dall'area personale."
+          ? "Confermando il pagamento autorizzi il salvataggio sicuro della carta tramite Stripe per il rinnovo automatico dopo 48 ore. Puoi annullare dall'area personale."
           : "Pagamento elaborato da Stripe. I dati della carta non transitano sui nostri server."}
       </p>
     </form>

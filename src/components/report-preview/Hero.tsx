@@ -86,7 +86,7 @@ export function ReportPreviewHero({ query, startingFromPrice, onScrollToPricing 
               A partire da{" "}
               <span className="font-medium tabular-nums text-slate-900">{startingFromPrice}</span>
               <span className="mx-2 text-slate-300">·</span>
-              offerta introduttiva, poi abbonamento mensile dopo 3 giorni
+              offerta introduttiva, poi abbonamento ogni 4 settimane dopo 48 ore
             </p>
           </div>
         </div>

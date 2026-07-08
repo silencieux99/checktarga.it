@@ -1,3 +1,4 @@
+import { COMPANY, COMPANY_FULL_ADDRESS } from "@/lib/company";
 import { SITE } from "@/lib/pricing";
 import { BASE_URL, SEO } from "@/lib/seo";
 
@@ -6,13 +7,24 @@ export default function StructuredData() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: SITE.name,
+    legalName: COMPANY.legalName,
     url: BASE_URL,
     logo: `${BASE_URL}/apple-icon`,
     email: SITE.supportEmail,
+    identifier: COMPANY.companyNumber,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: COMPANY.addressLines.slice(0, 2).join(", "),
+      addressLocality: COMPANY.addressLines[2],
+      postalCode: COMPANY.addressLines[3],
+      addressCountry: "GB",
+    },
     areaServed: {
       "@type": "Country",
       name: "Italia",
     },
+    description:
+      "Servizio privato e indipendente per consultare lo storico disponibile di un veicolo tramite targa o VIN.",
   };
 
   const website = {
@@ -24,7 +36,8 @@ export default function StructuredData() {
     inLanguage: "it-IT",
     publisher: {
       "@type": "Organization",
-      name: SITE.name,
+      name: COMPANY.legalName,
+      url: BASE_URL,
     },
   };
 
@@ -34,8 +47,9 @@ export default function StructuredData() {
     name: "Report storico veicolo",
     provider: {
       "@type": "Organization",
-      name: SITE.name,
+      name: COMPANY.legalName,
       url: BASE_URL,
+      address: COMPANY_FULL_ADDRESS,
     },
     areaServed: {
       "@type": "Country",

@@ -223,7 +223,7 @@ function AdminSubscriptionsContent() {
         <div>
           <h1 className="text-3xl font-bold text-white">Abbonamenti</h1>
           <p className="mt-2 text-slate-400">
-            Monitora trial, rinnovi mensili, disdette e ricavi ricorrenti.
+            Monitora trial, rinnovi ogni 4 settimane, disdette e ricavi ricorrenti.
           </p>
         </div>
         <button
@@ -244,7 +244,7 @@ function AdminSubscriptionsContent() {
         <KpiCard
           label="Ricavo ricorrente"
           value={formatPrice(stats.recurringRevenueCents / 100)}
-          hint="Somma cicli attivi mensili"
+          hint="Somma cicli attivi ogni 4 settimane"
         />
         <KpiCard
           label="Disdette in corso"
@@ -363,7 +363,7 @@ function AdminSubscriptionsContent() {
                     <td className="px-4 py-3 font-medium text-white">
                       {formatPrice(item.recurringAmount / 100)}
                       <span className="block text-xs font-normal text-slate-500">
-                        mensile
+                        ogni 4 settimane
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-300">

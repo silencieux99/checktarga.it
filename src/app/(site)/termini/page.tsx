@@ -4,15 +4,15 @@ import TermsOfServiceContent from "@/components/legal/TermsOfServiceContent";
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Termini e condizioni di utilizzo",
+  title: "Condizioni generali di vendita",
   description:
-    "Condizioni generali di utilizzo di CheckTarga.it: abbonamenti, report veicolo, disdetta, recesso e responsabilità.",
+    "Condizioni generali di vendita di CheckTarga.it gestito da MG COMPANY DAYA LTD: abbonamenti, report veicolo, disdetta, recesso e responsabilità.",
   path: "/termini",
 });
 
 export default function TerminiPage() {
   return (
-    <LegalLayout title="Condizioni di utilizzo">
+    <LegalLayout title="Condizioni generali di vendita">
       <TermsOfServiceContent />
     </LegalLayout>
   );

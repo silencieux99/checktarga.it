@@ -1,6 +1,7 @@
 import StructuredData from "@/components/StructuredData";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
+import PrivateServiceDisclaimer from "@/components/legal/PrivateServiceDisclaimer";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import StepsSection from "@/components/home/StepsSection";
@@ -19,6 +20,11 @@ export default function HomePage() {
       <SiteHeader />
       <main>
         <HeroSection />
+        <div className="border-b border-slate-200 bg-white">
+          <div className="mx-auto max-w-6xl px-4 py-6">
+            <PrivateServiceDisclaimer />
+          </div>
+        </div>
         <FeaturesSection />
         <StepsSection />
         <StatsSection />

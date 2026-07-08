@@ -1,8 +1,16 @@
-"use client";
-
-import Link from "next/link";
+import type { Metadata } from "next";
 import Container from "@/components/Container";
+import PrivateServiceDisclaimer from "@/components/legal/PrivateServiceDisclaimer";
+import { SUBSCRIPTION_PRE_PAYMENT_NOTICE } from "@/lib/company";
 import { SITE } from "@/lib/pricing";
+import { buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Abbonamento",
+  description:
+    "Informazioni chiare su pagamento iniziale, rinnovo automatico ogni 4 settimane e disdetta dell'abbonamento CheckTarga.it.",
+  path: "/abbonamento",
+});
 
 export default function AbbonamentoPage() {
   return (
@@ -13,10 +21,12 @@ export default function AbbonamentoPage() {
             Abbonamento
           </h1>
           <p className="mt-4 text-base leading-relaxed text-slate-700">
-            Questa pagina spiega in modo chiaro come funziona l’offerta prima del pagamento.
+            Questa pagina spiega in modo chiaro come funziona l&apos;offerta prima del pagamento.
           </p>
 
           <div className="mt-8 space-y-6">
+            <PrivateServiceDisclaimer />
+
             <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <h2 className="text-lg font-semibold text-slate-950">Pagamento iniziale</h2>
               <p className="mt-2 text-base text-slate-700">
@@ -25,44 +35,29 @@ export default function AbbonamentoPage() {
               </p>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h2 className="text-lg font-semibold text-slate-950">Prova di 3 giorni</h2>
-              <p className="mt-2 text-base text-slate-700">
-                Dopo l’acquisto, hai <span className="font-semibold">3 giorni</span> prima che parta
-                il rinnovo dell’abbonamento.
-              </p>
-            </section>
-
-            <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h2 className="text-lg font-semibold text-slate-950">Prezzo e rinnovo</h2>
-              <p className="mt-2 text-base text-slate-700">
-                Trascorsi 3 giorni, l’abbonamento si rinnova automaticamente a{" "}
-                <span className="font-semibold">29,99 €/mese</span> fino alla disdetta.
-              </p>
+            <section className="rounded-2xl border-2 border-slate-900 bg-white p-6">
+              <h2 className="text-lg font-semibold text-slate-950">Rinnovo automatico</h2>
+              <p className="mt-2 text-base font-medium text-slate-900">{SUBSCRIPTION_PRE_PAYMENT_NOTICE}</p>
             </section>
 
             <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <h2 className="text-lg font-semibold text-slate-950">Come annullare</h2>
               <p className="mt-2 text-base text-slate-700">
-                Puoi annullare in qualsiasi momento dal tuo account. Per le istruzioni passo-passo,
-                visita la pagina{" "}
-                <Link
-                  href="/disdetta"
-                  className="font-semibold text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
-                >
+                Puoi annullare in qualsiasi momento dal tuo account. Consulta la pagina{" "}
+                <a href="/disdetta" className="font-semibold text-brand-accent underline underline-offset-2">
                   Disdetta
-                </Link>
-                .
+                </a>{" "}
+                per i passaggi dettagliati.
               </p>
             </section>
 
             <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <h2 className="text-lg font-semibold text-slate-950">Supporto</h2>
               <p className="mt-2 text-base text-slate-700">
-                Per assistenza puoi scriverci a{" "}
+                Per assistenza scrivi a{" "}
                 <a
                   href={`mailto:${SITE.supportEmail}`}
-                  className="font-semibold text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
+                  className="font-semibold text-brand-accent underline underline-offset-2"
                 >
                   {SITE.supportEmail}
                 </a>
@@ -75,4 +70,3 @@ export default function AbbonamentoPage() {
     </div>
   );
 }
-

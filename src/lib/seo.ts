@@ -7,7 +7,7 @@ export const SEO = {
   titleDefault: `${SITE.name} — Storico veicolo e verifica targa`,
   titleTemplate: `%s | ${SITE.name}`,
   description:
-    "Controlla lo storico di un'auto usata in Italia: chilometri, sinistri, revisioni e dati PRA prima di firmare. Report completo per targa o VIN.",
+    "Controlla lo storico di un'auto usata in Italia: chilometri, sinistri, revisioni e dati disponibili prima di firmare. Report basato sui dati disponibili per targa o VIN.",
   keywords: [
     "verifica targa",
     "storico auto usata",
@@ -31,6 +31,12 @@ export const PUBLIC_ROUTES = [
   { path: "/note-legali", changeFrequency: "yearly" as const, priority: 0.3 },
   { path: "/privacy", changeFrequency: "yearly" as const, priority: 0.3 },
   { path: "/termini", changeFrequency: "yearly" as const, priority: 0.3 },
+  { path: "/chi-siamo", changeFrequency: "yearly" as const, priority: 0.5 },
+  { path: "/contatti", changeFrequency: "yearly" as const, priority: 0.5 },
+  { path: "/abbonamento", changeFrequency: "yearly" as const, priority: 0.4 },
+  { path: "/disdetta", changeFrequency: "yearly" as const, priority: 0.4 },
+  { path: "/rimborso", changeFrequency: "yearly" as const, priority: 0.3 },
+  { path: "/cookie", changeFrequency: "yearly" as const, priority: 0.3 },
 ];
 
 interface PageMetadataOptions {
@@ -89,9 +95,9 @@ export const rootMetadata: Metadata = {
   },
   description: SEO.description,
   keywords: [...SEO.keywords],
-  authors: [{ name: SITE.name, url: BASE_URL }],
+  authors: [{ name: "MG COMPANY DAYA LTD", url: BASE_URL }],
   creator: SITE.name,
-  publisher: SITE.name,
+  publisher: "MG COMPANY DAYA LTD",
   applicationName: SITE.name,
   category: "automotive",
   alternates: {

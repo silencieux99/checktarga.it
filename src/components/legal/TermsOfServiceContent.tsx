@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { SITE, SUBSCRIPTION_TRIAL_HOURS } from "@/lib/pricing";
+import LegalCompanyBlock from "@/components/legal/LegalCompanyBlock";
+import PrivateServiceDisclaimer from "@/components/legal/PrivateServiceDisclaimer";
+import {
+  COMPANY,
+  DATA_VARIABILITY_NOTICE,
+  SUBSCRIPTION_PRE_PAYMENT_NOTICE,
+} from "@/lib/company";
+import { SITE, SUBSCRIPTION_BILLING_INTERVAL_COUNT, SUBSCRIPTION_TRIAL_HOURS } from "@/lib/pricing";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -23,12 +30,18 @@ export default function TermsOfServiceContent() {
   return (
     <article className="legal-prose">
       <p className="text-sm font-medium text-slate-500">
-        Ultimo aggiornamento: 7 giugno 2026
+        Ultimo aggiornamento: 8 luglio 2026
       </p>
 
       <p className="text-lg font-semibold text-slate-900 mt-6">
-        CONDIZIONI DI UTILIZZO DEL SITO {SITE.domain}
+        CONDIZIONI GENERALI DI VENDITA — {SITE.domain}
       </p>
+
+      <div className="mt-6 space-y-4">
+        <LegalCompanyBlock />
+        <PrivateServiceDisclaimer />
+        <p className="text-sm text-slate-700">{DATA_VARIABILITY_NOTICE}</p>
+      </div>
 
       <Section id="generali" title="1. Disposizioni generali">
         <Sub title="1.1. Il contratto">
@@ -36,7 +49,7 @@ export default function TermsOfServiceContent() {
             Le presenti condizioni generali (le &quot;Condizioni&quot;) definiscono le regole di
             utilizzo del sito web {SITE.domain} e dei servizi ivi forniti (collettivamente, &quot;
             {SITE.name}&quot; o il &quot;Servizio&quot;). Le Condizioni costituiscono un accordo
-            giuridicamente vincolante tra l&apos;utente e il gestore del Servizio.
+            giuridicamente vincolante tra l&apos;utente e {COMPANY.legalName}, gestore del Servizio.
           </p>
         </Sub>
         <Sub title="1.2. Finalità">
@@ -203,7 +216,7 @@ export default function TermsOfServiceContent() {
               Include: 1 report immediato
             </li>
             <li>
-              Dopo 3 giorni: abbonamento mensile a 29,99 €/mese
+              Dopo {SUBSCRIPTION_TRIAL_HOURS} ore: abbonamento a 29,99 € ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane
             </li>
             <li>Rinnovo automatico fino alla disdetta</li>
             <li>
@@ -222,7 +235,7 @@ export default function TermsOfServiceContent() {
             <li>Oggi paghi: 6,99 €</li>
             <li>Crediti immediati: 5 Report</li>
             <li>
-              Dopo 3 giorni: abbonamento mensile a 39,99 €/mese
+              Dopo {SUBSCRIPTION_TRIAL_HOURS} ore: abbonamento a 39,99 € ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane
             </li>
             <li>Rinnovo automatico fino alla disdetta</li>
             <li>
@@ -237,13 +250,17 @@ export default function TermsOfServiceContent() {
           <p className="mt-4">
             <strong>Cosa succede dopo il pagamento iniziale?</strong>
           </p>
-          <p>
+          <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-900">
+            {SUBSCRIPTION_PRE_PAYMENT_NOTICE}
+          </p>
+          <p className="mt-4">
             L&apos;abbonamento inizia con il pagamento dell&apos;offerta introduttiva. Al momento del
             checkout, la carta di pagamento viene salvata in modo sicuro tramite Stripe per
-            consentire i rinnovi automatici. Trascorsi 3 giorni dal primo pagamento, l&apos;abbonamento
-            si rinnova automaticamente al prezzo ricorrente indicato sopra, con rinnovo mensile fino a
-            disdetta. Puoi annullare in qualsiasi momento dall&apos;area personale o contattando il
-            supporto prima del prossimo addebito. Per dettagli, consulta{" "}
+            consentire i rinnovi automatici. Trascorse {SUBSCRIPTION_TRIAL_HOURS} ore dal primo
+            pagamento, l&apos;abbonamento si rinnova automaticamente al prezzo ricorrente indicato
+            sopra, ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane, fino a disdetta. Puoi
+            annullare in qualsiasi momento dall&apos;area personale o contattando il supporto prima
+            del prossimo addebito. Per dettagli, consulta{" "}
             <Link href="/abbonamento" className="text-brand-accent underline underline-offset-2">
               Abbonamento
             </Link>{" "}
@@ -465,10 +482,9 @@ export default function TermsOfServiceContent() {
 
       <Section id="legge" title="11. Legge applicabile e foro competente">
         <p>
-          Le presenti Condizioni sono regolate dalla legge italiana. Per i consumatori, resta fermo
-          il foro inderogabile del luogo di residenza o domicilio del consumatore, ove applicabile.
-          Per i professionisti, foro competente esclusivo: Italia, salvo diversa disposizione
-          inderogabile di legge.
+          Le presenti Condizioni sono regolate dalla legge inglese, in relazione a {COMPANY.legalName}.
+          Per i consumatori, resta fermo il foro inderogabile del luogo di residenza o domicilio del
+          consumatore, ove applicabile.
         </p>
       </Section>
 

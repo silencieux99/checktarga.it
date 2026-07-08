@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { COMPANY } from "./company";
 import { SITE } from "./pricing";
 
 const smtpTransporter = nodemailer.createTransport({
@@ -74,7 +75,9 @@ export async function sendOrderConfirmationEmail(
       </a>
     </div>
     <p style="margin-top:24px;font-size:12px;color:#9ca3af;">
-      Assistenza: ${SITE.supportEmail}
+      Assistenza: ${SITE.supportEmail}<br />
+      ${COMPANY.legalName} — Company Number ${COMPANY.companyNumber}<br />
+      CheckTarga.it è un servizio privato e indipendente.
     </p>
   </div>
 </body>

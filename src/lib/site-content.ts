@@ -4,6 +4,7 @@ export const NAV_LINKS = [
   { href: "/#funzionalita", label: "Funzionalità" },
   { href: "/#come-funziona", label: "Come funziona" },
   { href: "/prezzi", label: "Prezzi" },
+  { href: "/chi-siamo", label: "Chi siamo" },
   { href: "/#faq", label: "FAQ" },
 ];
 
@@ -105,7 +106,7 @@ export const MISSION = {
   label: "La nostra missione",
   title: "Rendere lo storico veicoli chiaro, accessibile e affidabile per tutti.",
   paragraphs: [
-    "Forniamo report trasparenti basati su dati certificati e fonti ufficiali per aiutarti ad acquistare con serenità.",
+    "Forniamo report trasparenti basati sui dati disponibili da fonti certificate e partner per aiutarti ad acquistare con serenità.",
     "Il nostro obiettivo è eliminare lo stress dell'acquisto di un'usato rendendo le verifiche semplici e comprensibili.",
   ],
   guarantee:
@@ -148,8 +149,8 @@ export const PRICING_TEASER = {
   label: "Prezzi trasparenti",
   title: "Il tuo report è a pochi clic di distanza.",
   subtitle:
-    "Offerta introduttiva da 4,99 € con rinnovo mensile dopo 3 giorni. Ogni piano include report basato sui dati disponibili, crediti periodici e garanzia 14 giorni.",
-  benefits: ["Report basato sui dati disponibili", "Crediti mensili inclusi", "Garanzia 14 giorni"],
+    "Offerta introduttiva da 4,99 € con rinnovo ogni 4 settimane dopo 48 ore. Ogni piano include report basato sui dati disponibili, crediti periodici e garanzia 14 giorni.",
+  benefits: ["Report basato sui dati disponibili", "Crediti periodici inclusi", "Garanzia 14 giorni"],
   cta: "Scegli il piano",
 };
 
@@ -160,19 +161,39 @@ export const FAQ_ITEMS = [
       "Il report offre una visione dettagliata del passato del veicolo: storico chilometri, revisioni, sinistri segnalati, dati tecnici, intestatari e altre informazioni utili per una decisione informata.",
   },
   {
+    question: "Da dove provengono i dati?",
+    answer:
+      "I dati provengono da banche dati commerciali, partner certificati e fonti pubbliche o semi-pubbliche accessibili legalmente. CheckTarga.it non è un ente ufficiale e non rilascia visure governative.",
+  },
+  {
+    question: "Perché alcuni dati possono non essere disponibili?",
+    answer:
+      "La disponibilità dipende dal veicolo, dalla sua storia, dalla regione e dalle fonti consultabili al momento della richiesta. Alcune informazioni potrebbero non essere mai registrate o non essere accessibili.",
+  },
+  {
     question: "Come ottengo un report su CheckTarga.it?",
     answer:
       "Inserisci la targa italiana o il VIN nella home page, consulta l'anteprima gratuita e completa il pagamento. Dopo la conferma, i crediti sono subito disponibili nella tua area personale.",
   },
   {
-    question: "Posso fidarmi dell'accuratezza dei dati?",
-    answer:
-      "I nostri report si basano su fonti ufficiali, partner certificati e banche dati aggiornate quotidianamente. Consigliamo comunque di usarli come parte di una valutazione completa del veicolo.",
-  },
-  {
     question: "Come funziona l'abbonamento?",
     answer:
-      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 3 giorni parte il rinnovo automatico mensile sulla carta salvata. Puoi annullare in qualsiasi momento dall'area personale.",
+      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 48 ore parte il rinnovo automatico ogni 4 settimane sulla carta salvata. Puoi annullare in qualsiasi momento dall'area personale.",
+  },
+  {
+    question: "Come annullare l'abbonamento?",
+    answer:
+      "Accedi al tuo account, vai su Il mio account, seleziona Gestisci abbonamento e clicca su Annulla abbonamento. Puoi anche consultare la pagina Disdetta per i passaggi dettagliati.",
+  },
+  {
+    question: "Come funziona il rimborso?",
+    answer:
+      "Se il report non contiene dati utili rispetto a quanto ragionevolmente atteso, puoi contattarci entro 30 giorni per una verifica. Consulta anche la pagina Rimborso per maggiori dettagli.",
+  },
+  {
+    question: "Quanto tempo viene conservato il report?",
+    answer:
+      "I report restano consultabili nella tua area personale per il tempo necessario a fornire il servizio e secondo i termini indicati nelle Condizioni generali e nella Privacy Policy.",
   },
   {
     question: "Quali metodi di pagamento accettate?",
@@ -181,7 +202,7 @@ export const FAQ_ITEMS = [
   },
   {
     question: "Come posso contattare l'assistenza?",
-    answer: `Scrivici a ${SITE.supportEmail}. Rispondiamo in genere entro 24 ore, 7 giorni su 7.`,
+    answer: `Scrivici a ${SITE.supportEmail} o usa la pagina Contatti. Rispondiamo in genere entro 24 ore, 7 giorni su 7.`,
   },
 ];
 
@@ -217,8 +238,9 @@ export const FOOTER_COLUMNS = [
     links: [
       { label: "Verifica targa", href: "/#hero" },
       { label: "Prezzi", href: "/prezzi" },
+      { label: "Chi siamo", href: "/chi-siamo" },
+      { label: "Contatti", href: "/contatti" },
       { label: "Esempio report", href: "/esempio-report" },
-      { label: "Blog", href: "/blog" },
       { label: "Abbonamento", href: "/abbonamento" },
       { label: "Disdetta", href: "/disdetta" },
     ],
@@ -228,7 +250,7 @@ export const FOOTER_COLUMNS = [
     links: [
       { label: "Accedi", href: "/login" },
       { label: "Il mio account", href: "/account" },
-      { label: "Assistenza", href: `mailto:${SITE.supportEmail}` },
+      { label: "Assistenza", href: "/contatti" },
     ],
   },
   {
@@ -237,6 +259,7 @@ export const FOOTER_COLUMNS = [
       { label: "Condizioni generali", href: "/termini" },
       { label: "Privacy", href: "/privacy" },
       { label: "Note legali", href: "/note-legali" },
+      { label: "Cookie", href: "/cookie" },
       { label: "Rimborso", href: "/rimborso" },
     ],
   },

@@ -3,49 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import Container from "@/components/Container";
-
-const FAQS = [
-  {
-    question: "Quanto tempo ci vuole per ricevere il report?",
-    answer:
-      "Dopo il pagamento, l'accesso all'area personale è immediato. La generazione del report richiede in genere pochi minuti.",
-  },
-  {
-    question: "Posso verificare qualsiasi targa italiana?",
-    answer:
-      "Sì, supportiamo le targhe immatricolate in Italia. Puoi anche cercare tramite numero di telaio (VIN).",
-  },
-  {
-    question: "I dati sono aggiornati?",
-    answer:
-      "Incrociamo fonti ufficiali e partner certificati. I database vengono aggiornati quotidianamente.",
-  },
-  {
-    question: "Come funziona il rimborso?",
-    answer:
-      "Se il report non contiene dati utili rispetto a quanto promesso, puoi contattarci entro 30 giorni per una verifica del rimborso.",
-  },
-  {
-    question: "Come funziona l'abbonamento?",
-    answer:
-      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 3 giorni parte il rinnovo automatico mensile (29,99 € o 39,99 €) sulla carta salvata in sicurezza tramite Stripe. Puoi annullare in qualsiasi momento dall'area personale.",
-  },
-  {
-    question: "Il pagamento è sicuro?",
-    answer:
-      "Sì, utilizziamo Stripe. I dati della carta non transitano sui nostri server.",
-  },
-  {
-    question: "Cos'è un leasing irregolare?",
-    answer:
-      "Si tratta di un veicolo ancora vincolato a un contratto di noleggio o leasing long term, venduto senza estinzione del contratto. Può comportare rischi legali per l'acquirente.",
-  },
-  {
-    question: "Cos'è un fermo amministrativo?",
-    answer:
-      "È un vincolo che impedisce la vendita del veicolo fino alla risoluzione di un debito o procedura. Il nostro report segnala queste situazioni quando presenti.",
-  },
-];
+import { FAQ_ITEMS } from "@/lib/site-content";
 
 export default function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -61,7 +19,7 @@ export default function Faq() {
         </div>
 
         <div className="mx-auto max-w-2xl space-y-3">
-          {FAQS.map((faq, index) => (
+          {FAQ_ITEMS.map((faq, index) => (
             <div key={faq.question} className="overflow-hidden rounded-xl border border-slate-200">
               <button
                 type="button"

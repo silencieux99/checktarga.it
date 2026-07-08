@@ -15,6 +15,7 @@ import { InsurancePartners } from "./InsurancePartners";
 import { ReportPreviewPricing } from "./Pricing";
 import { ReportPreviewGuarantee } from "./Guarantee";
 import { ReportPreviewFaq } from "./Faq";
+import PrivateServiceDisclaimer from "@/components/legal/PrivateServiceDisclaimer";
 
 export default function ReportPreviewView() {
   const router = useRouter();
@@ -69,8 +70,8 @@ export default function ReportPreviewView() {
       />
 
       <div className="mx-auto max-w-6xl px-5 md:px-10">
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-700 md:mt-8">
-          Le informazioni disponibili possono variare in base al veicolo e alle fonti consultabili.
+        <div className="mt-6 md:mt-8">
+          <PrivateServiceDisclaimer />
         </div>
       </div>
 

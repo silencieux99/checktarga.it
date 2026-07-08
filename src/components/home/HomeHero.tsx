@@ -148,7 +148,7 @@ export default function HomeHero() {
               </button>
 
               <p className="mt-2.5 text-center text-[10px] text-slate-400 sm:mt-3 sm:text-xs">
-                Report completo in 2 min • Accesso immediato • Soddisfatti o rimborsati
+                Report basato sui dati disponibili in 2 min • Accesso immediato • Soddisfatti o rimborsati
               </p>
             </form>
           </div>

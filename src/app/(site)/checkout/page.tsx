@@ -14,6 +14,8 @@ import PageLoader from "@/components/PageLoader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import StripeCheckoutForm from "@/components/checkout/StripeCheckoutForm";
 import SubscriptionTerms from "@/components/checkout/SubscriptionTerms";
+import PrivateServiceDisclaimer from "@/components/legal/PrivateServiceDisclaimer";
+import { SUBSCRIPTION_PRE_PAYMENT_NOTICE } from "@/lib/company";
 
 function CheckoutContent() {
   const router = useRouter();
@@ -120,12 +122,17 @@ function CheckoutContent() {
           <h2 className="font-semibold text-slate-900">{plan.name}</h2>
           <p className="text-sm text-slate-600 mt-1">{plan.description}</p>
           <p className="mt-4 text-2xl font-bold text-slate-900">{amountLabel}</p>
+          {subscriptionPlan && (
+            <p className="mt-3 text-sm font-medium text-slate-800">{SUBSCRIPTION_PRE_PAYMENT_NOTICE}</p>
+          )}
           {vehicle && (
             <p className="text-xs text-slate-500 mt-3">
               Veicolo: {vehicleType === "plate" ? "Targa" : "VIN"} {vehicle}
             </p>
           )}
         </div>
+
+        <PrivateServiceDisclaimer className="mb-6" />
 
         <div className="mt-6">
           {step === "email" ? (
@@ -192,6 +199,26 @@ function CheckoutContent() {
                   >
                     Informativa privacy
                   </Link>
+                  , le{" "}
+                  <Link
+                    href="/note-legali"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Note legali
+                  </Link>{" "}
+                  e la{" "}
+                  <Link
+                    href="/rimborso"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Politica di rimborso
+                  </Link>
                   .
                 </span>
               </label>
@@ -241,10 +268,7 @@ function CheckoutContent() {
                   </div>
                   <div className="mt-3 space-y-1.5 text-sm text-slate-900">
                     <p>Include: 1 report immediato</p>
-                    <p>
-                      Dopo 3 giorni: abbonamento mensile a{" "}
-                      {formatPrice(subscriptionPlan.subscription.recurringPrice)}/mese
-                    </p>
+                    <p>{SUBSCRIPTION_PRE_PAYMENT_NOTICE}</p>
                     <p>Rinnovo automatico fino alla disdetta</p>
                     <p>Puoi annullare in qualsiasi momento dal tuo account</p>
                   </div>

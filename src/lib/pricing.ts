@@ -19,8 +19,8 @@ export interface SubscriptionConfig {
   recurringCredits: number;
 }
 
-export const SUBSCRIPTION_BILLING_INTERVAL = "month" as const;
-export const SUBSCRIPTION_BILLING_INTERVAL_COUNT = 1;
+export const SUBSCRIPTION_BILLING_INTERVAL = "week" as const;
+export const SUBSCRIPTION_BILLING_INTERVAL_COUNT = 4;
 
 export interface PricingPlan {
   id: PlanSku;
@@ -39,7 +39,7 @@ export interface PricingPlan {
   subscription?: SubscriptionConfig;
 }
 
-export const SUBSCRIPTION_TRIAL_HOURS = 72;
+export const SUBSCRIPTION_TRIAL_HOURS = 48;
 
 export const PRICING_PLANS: PricingPlan[] = [
   {
@@ -65,7 +65,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "1 report basato sui dati disponibili subito",
       "Storico chilometri e revisioni",
       "Verifica sinistri e fermo amministrativo",
-      "Rinnovo automatico mensile con 1 nuovo credito",
+      "Rinnovo automatico ogni 4 settimane con 1 nuovo credito",
     ],
   },
   {
@@ -90,7 +90,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "5 report basati sui dati disponibili subito",
       "Confronta più veicoli in tranquillità",
       "Esportazione PDF illimitata",
-      "Rinnovo automatico mensile con 5 nuovi crediti",
+      "Rinnovo automatico ogni 4 settimane con 5 nuovi crediti",
     ],
   },
   {
@@ -162,11 +162,10 @@ export function formatSubscriptionRecurringLabel(plan: PricingPlan): string {
 export function getSubscriptionTerms(plan: PricingPlan): string {
   if (!plan.subscription) return "";
   const { introPrice, recurringPrice, trialHours, recurringCredits } = plan.subscription;
-  const trialDays = Math.round(trialHours / 24);
   return (
     `Oggi paghi ${formatPrice(introPrice)} e ricevi ${plan.reports} credito${plan.reports > 1 ? "i" : ""} immediatamente. ` +
     `La carta viene salvata in modo sicuro tramite Stripe. ` +
-    `Dopo ${trialDays} giorni verrà addebitato ${formatPrice(recurringPrice)}/mese ` +
+    `Trascorse ${trialHours} ore verrà addebitato ${formatPrice(recurringPrice)} ${formatSubscriptionBillingPeriod(plan.subscription)} ` +
     `con ${recurringCredits} nuovo${recurringCredits > 1 ? "i" : ""} credito${recurringCredits > 1 ? "i" : ""}. ` +
     `Puoi annullare in qualsiasi momento dall'area personale prima del prossimo addebito.`
   );

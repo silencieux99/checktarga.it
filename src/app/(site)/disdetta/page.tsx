@@ -1,6 +1,5 @@
-"use client";
-
 import Container from "@/components/Container";
+import { SITE } from "@/lib/pricing";
 
 export default function DisdettaPage() {
   return (
@@ -11,7 +10,7 @@ export default function DisdettaPage() {
             Disdetta
           </h1>
           <p className="mt-4 text-base leading-relaxed text-slate-700">
-            Puoi annullare l’abbonamento in qualsiasi momento dal tuo account.
+            Puoi annullare l&apos;abbonamento in qualsiasi momento dal tuo account.
           </p>
 
           <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
@@ -35,10 +34,10 @@ export default function DisdettaPage() {
           <p className="mt-6 text-base text-slate-700">
             Se hai difficoltà, contattaci a{" "}
             <a
-              href="mailto:support@visuraveicolo.it"
+              href={`mailto:${SITE.supportEmail}`}
               className="font-semibold text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
             >
-              support@visuraveicolo.it
+              {SITE.supportEmail}
             </a>
             .
           </p>
@@ -47,4 +46,3 @@ export default function DisdettaPage() {
     </div>
   );
 }
-
