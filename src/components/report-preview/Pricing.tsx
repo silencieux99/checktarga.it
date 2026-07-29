@@ -3,7 +3,6 @@
 import {
   PricingPlan,
   formatPrice,
-  formatSubscriptionIntroLabel,
   getVisiblePricingPlans,
 } from "@/lib/pricing";
 
@@ -54,7 +53,7 @@ function PlanRow({
         </div>
         <div className="flex-shrink-0 text-right">
           <p className="text-[20px] font-light leading-none tracking-tight text-slate-900 tabular-nums lg:text-[22px]">
-            {plan.subscription ? formatSubscriptionIntroLabel(plan) : formatPrice(plan.price)}
+            {formatPrice(plan.price)}
           </p>
           {savePct > 0 && (
             <span className="mt-1.5 block text-[10px] font-medium tabular-nums text-emerald-700">
@@ -83,7 +82,7 @@ export function ReportPreviewPricing({ vehicleValue, onCheckout }: Props) {
         <div className="mb-12 flex flex-col gap-8 lg:mb-20 lg:flex-row lg:items-end lg:justify-between lg:gap-20">
           <div className="min-w-0 flex-1 lg:max-w-2xl">
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.22em] text-slate-400">
-              Prezzi · Offerta introduttiva
+              Prezzi · Pacchetti report
             </p>
             <h2 className="text-balance text-[32px] font-light leading-[1.05] tracking-[-0.02em] text-slate-950 sm:text-[40px] lg:text-[56px]">
               Il report che ogni acquirente{" "}

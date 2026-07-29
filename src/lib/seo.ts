@@ -33,8 +33,6 @@ export const PUBLIC_ROUTES = [
   { path: "/termini", changeFrequency: "yearly" as const, priority: 0.3 },
   { path: "/chi-siamo", changeFrequency: "yearly" as const, priority: 0.5 },
   { path: "/contatti", changeFrequency: "yearly" as const, priority: 0.5 },
-  { path: "/abbonamento", changeFrequency: "yearly" as const, priority: 0.4 },
-  { path: "/disdetta", changeFrequency: "yearly" as const, priority: 0.4 },
   { path: "/rimborso", changeFrequency: "yearly" as const, priority: 0.3 },
   { path: "/cookie", changeFrequency: "yearly" as const, priority: 0.3 },
 ];

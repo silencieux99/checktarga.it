@@ -28,12 +28,12 @@ export default function PricingTeaserSection() {
           </div>
 
           <div className="flex flex-col justify-center bg-brand p-8 text-white sm:p-10 lg:p-12">
-            <p className="text-sm text-slate-400">Offerta introduttiva</p>
+            <p className="text-sm text-slate-400">A partire da</p>
             <p className="mt-2 text-5xl font-light tracking-tight">
-              4,99 €
-              <span className="ml-2 text-lg text-slate-400">oggi</span>
+              15,99 €
+              <span className="ml-2 text-lg text-slate-400">pagamento unico</span>
             </p>
-            <p className="mt-4 text-slate-400">poi 29,99 € ogni 4 settimane dopo 48 ore</p>
+            <p className="mt-4 text-slate-400">6 report a 23,99 € · 10 a 34,99 € · 20 a 49,99 €</p>
             <div className="mt-8 space-y-3 border-t border-white/10 pt-8 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-400">Sinistri</span>

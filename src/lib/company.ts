@@ -21,12 +21,6 @@ Non siamo affiliati, autorizzati o rappresentiamo ACI, PRA, il Ministero delle I
 
 Tutti i marchi citati appartengono ai rispettivi proprietari.`;
 
-export const SUBSCRIPTION_PRE_PAYMENT_NOTICE =
-  "Acquistando oggi a €4,99 accetti che, trascorse 48 ore, inizierà un abbonamento di €29,99 ogni 4 settimane fino alla cancellazione.";
-
-export const SUBSCRIPTION_CONSENT_CHECKBOX_LABEL =
-  "Ho letto e compreso le condizioni dell'abbonamento.";
-
 export const DATA_VARIABILITY_NOTICE =
   "Le informazioni disponibili possono variare in base al veicolo e alle fonti consultabili.";
 

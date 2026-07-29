@@ -55,9 +55,9 @@ export default function ChiSiamoPage() {
             <section>
               <h2 className="text-xl font-semibold text-slate-950">Il nostro impegno per la trasparenza</h2>
               <p className="mt-3 text-base leading-relaxed text-slate-700">
-                Presentiamo chiaramente prezzi, abbonamento, rinnovo automatico e modalità di
-                disdetta prima del pagamento. Non ci presentiamo come ente pubblico né come
-                rappresentanti ufficiali di ACI, PRA o Motorizzazione Civile.
+                Presentiamo chiaramente prezzi, pacchetti one-shot e modalità di rimborso prima del
+                pagamento. Non ci presentiamo come ente pubblico né come rappresentanti ufficiali di
+                ACI, PRA o Motorizzazione Civile.
               </p>
               <p className="mt-3 text-base leading-relaxed text-slate-700">{DATA_VARIABILITY_NOTICE}</p>
             </section>

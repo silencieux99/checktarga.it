@@ -21,8 +21,8 @@ const GUARANTEES = [
   },
   {
     no: "05",
-    title: "Abbonamento trasparente",
-    desc: "Offerta introduttiva, poi rinnovo ogni 4 settimane dopo 48 ore, cancellabile in qualsiasi momento.",
+    title: "Prezzi trasparenti",
+    desc: "Pacchetti one-shot da 15,99 €. Pagamento unico, senza rinnovo automatico.",
   },
   {
     no: "06",

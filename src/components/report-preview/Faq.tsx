@@ -14,9 +14,9 @@ const FAQ_ITEMS = [
       "Hai 30 giorni per richiedere un rimborso se il report non contiene le informazioni promesse rispetto al veicolo verificato.",
   },
   {
-    question: "Serve un abbonamento?",
+    question: "Come funzionano i pacchetti?",
     answer:
-      "Paghi un importo introduttivo e ricevi subito i crediti. Dopo 48 ore parte il rinnovo automatico ogni 4 settimane sulla carta salvata tramite Stripe. Puoi annullare dall'area personale.",
+      "Acquisti un pacchetto one-shot (da 15,99 €) e usi i crediti quando vuoi. Nessun rinnovo automatico.",
   },
   {
     question: "Quanto tempo ci vuole?",

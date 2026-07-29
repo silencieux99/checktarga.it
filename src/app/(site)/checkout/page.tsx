@@ -3,19 +3,12 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  formatPrice,
-  formatSubscriptionIntroLabel,
-  getPlanBySku,
-  isSubscriptionPlan,
-} from "@/lib/pricing";
+import { formatPrice, getPlanBySku } from "@/lib/pricing";
 import { ArrowLeft, Loader2, Mail, ShieldCheck } from "lucide-react";
 import PageLoader from "@/components/PageLoader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import StripeCheckoutForm from "@/components/checkout/StripeCheckoutForm";
-import SubscriptionTerms from "@/components/checkout/SubscriptionTerms";
 import PrivateServiceDisclaimer from "@/components/legal/PrivateServiceDisclaimer";
-import { SUBSCRIPTION_PRE_PAYMENT_NOTICE } from "@/lib/company";
 
 function CheckoutContent() {
   const router = useRouter();
@@ -28,7 +21,6 @@ function CheckoutContent() {
   const [emailError, setEmailError] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState(false);
-  const [acceptedSubscriptionRenewal, setAcceptedSubscriptionRenewal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"email" | "payment">("email");
@@ -36,7 +28,6 @@ function CheckoutContent() {
   const [orderId, setOrderId] = useState<string | null>(null);
 
   const plan = sku ? getPlanBySku(sku) : undefined;
-  const subscriptionPlan = isSubscriptionPlan(plan) ? plan : null;
 
   useEffect(() => {
     if (!sku || !plan || plan.visible === false) router.replace("/prezzi");
@@ -96,9 +87,7 @@ function CheckoutContent() {
     return <PageLoader message="Caricamento checkout..." />;
   }
 
-  const amountLabel = subscriptionPlan
-    ? formatSubscriptionIntroLabel(subscriptionPlan)
-    : formatPrice(plan.price);
+  const amountLabel = formatPrice(plan.price);
 
   return (
     <div className="min-h-[70vh] py-10 relative">
@@ -122,9 +111,9 @@ function CheckoutContent() {
           <h2 className="font-semibold text-slate-900">{plan.name}</h2>
           <p className="text-sm text-slate-600 mt-1">{plan.description}</p>
           <p className="mt-4 text-2xl font-bold text-slate-900">{amountLabel}</p>
-          {subscriptionPlan && (
-            <p className="mt-3 text-sm font-medium text-slate-800">{SUBSCRIPTION_PRE_PAYMENT_NOTICE}</p>
-          )}
+          <p className="mt-2 text-sm text-slate-500">
+            Pagamento unico · {plan.reports} credito{plan.reports > 1 ? "i" : ""}
+          </p>
           {vehicle && (
             <p className="text-xs text-slate-500 mt-3">
               Veicolo: {vehicleType === "plate" ? "Targa" : "VIN"} {vehicle}
@@ -250,48 +239,12 @@ function CheckoutContent() {
                 <span className="font-medium">Email:</span> {email}
               </div>
 
-              {subscriptionPlan && (
-                <div className="rounded-2xl border-2 border-slate-900 bg-white p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-base font-bold text-slate-950">Riepilogo dell’offerta</p>
-                      <p className="mt-1 text-sm font-semibold text-slate-950">
-                        Oggi paghi: {formatPrice(subscriptionPlan.subscription.introPrice)}
-                      </p>
-                    </div>
-                    <Link
-                      href="/abbonamento"
-                      className="text-sm font-semibold text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover"
-                    >
-                      Dettagli abbonamento
-                    </Link>
-                  </div>
-                  <div className="mt-3 space-y-1.5 text-sm text-slate-900">
-                    <p>Include: 1 report immediato</p>
-                    <p>{SUBSCRIPTION_PRE_PAYMENT_NOTICE}</p>
-                    <p>Rinnovo automatico fino alla disdetta</p>
-                    <p>Puoi annullare in qualsiasi momento dal tuo account</p>
-                  </div>
-                </div>
-              )}
-
               {clientSecret && orderId && (
                 <StripeCheckoutForm
                   clientSecret={clientSecret}
                   orderId={orderId}
                   email={email}
                   amountLabel={amountLabel}
-                  isSubscription={Boolean(subscriptionPlan)}
-                  subscriptionConsent={
-                    subscriptionPlan
-                      ? {
-                          checked: acceptedSubscriptionRenewal,
-                          onCheckedChange: (checked) => {
-                            setAcceptedSubscriptionRenewal(checked);
-                          },
-                        }
-                      : undefined
-                  }
                 />
               )}
 
@@ -311,12 +264,6 @@ function CheckoutContent() {
             </div>
           )}
         </div>
-
-        {subscriptionPlan && (
-          <div className="mt-8 border-t border-slate-100 pt-4">
-            <SubscriptionTerms plan={subscriptionPlan} variant="finePrint" />
-          </div>
-        )}
       </div>
     </div>
   );

@@ -9,10 +9,6 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
-import {
-  SUBSCRIPTION_CONSENT_CHECKBOX_LABEL,
-  SUBSCRIPTION_PRE_PAYMENT_NOTICE,
-} from "@/lib/company";
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
@@ -23,12 +19,6 @@ interface StripeCheckoutFormProps {
   orderId: string;
   email: string;
   amountLabel: string;
-  isSubscription?: boolean;
-  subscriptionConsent?: {
-    checked: boolean;
-    onCheckedChange: (checked: boolean) => void;
-    error?: boolean;
-  };
 }
 
 function PaymentForm({
@@ -36,8 +26,6 @@ function PaymentForm({
   orderId,
   email,
   amountLabel,
-  isSubscription = false,
-  subscriptionConsent,
 }: StripeCheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
@@ -90,41 +78,9 @@ function PaymentForm({
         </div>
       )}
 
-      {isSubscription && (
-        <div className="rounded-2xl border-2 border-slate-900 bg-white p-4 text-sm font-medium leading-relaxed text-slate-900">
-          {SUBSCRIPTION_PRE_PAYMENT_NOTICE}
-        </div>
-      )}
-
-      {isSubscription && subscriptionConsent && (
-        <label
-          className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${
-            subscriptionConsent.error
-              ? "border-red-200 bg-red-50"
-              : "border-slate-200 bg-slate-50 hover:border-slate-300"
-          }`}
-        >
-          <input
-            type="checkbox"
-            checked={subscriptionConsent.checked}
-            onChange={(e) => subscriptionConsent.onCheckedChange(e.target.checked)}
-            disabled={isSubmitting}
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-accent focus:ring-brand-accent/30"
-          />
-          <span className="text-sm leading-relaxed text-slate-700">
-            {SUBSCRIPTION_CONSENT_CHECKBOX_LABEL}
-          </span>
-        </label>
-      )}
-
       <button
         type="submit"
-        disabled={
-          !stripe ||
-          !elements ||
-          isSubmitting ||
-          (isSubscription && subscriptionConsent ? !subscriptionConsent.checked : false)
-        }
+        disabled={!stripe || !elements || isSubmitting}
         className="btn-accent w-full disabled:opacity-60"
       >
         {isSubmitting ? (
@@ -135,15 +91,13 @@ function PaymentForm({
         ) : (
           <>
             <Lock className="w-4 h-4" />
-            {isSubscription ? `Paga ${amountLabel} oggi` : `Paga ${amountLabel}`}
+            Paga {amountLabel}
           </>
         )}
       </button>
 
       <p className="text-xs text-slate-500 text-center">
-        {isSubscription
-          ? "Confermando il pagamento autorizzi il salvataggio sicuro della carta tramite Stripe per il rinnovo automatico dopo 48 ore. Puoi annullare dall'area personale."
-          : "Pagamento elaborato da Stripe. I dati della carta non transitano sui nostri server."}
+        Pagamento elaborato da Stripe. I dati della carta non transitano sui nostri server.
       </p>
     </form>
   );

@@ -54,7 +54,6 @@ export function ReportPreviewStickyBar({
               {startingFromPlan ? (
                 <p className="truncate text-[13px] font-medium leading-tight text-slate-900">
                   Da {formatPrice(startingFromPlan.price)}
-                  <span className="ml-2 text-[11px] font-normal text-slate-400">da 4,99 €</span>
                 </p>
               ) : (
                 <p className="text-[13px] font-medium leading-tight text-slate-900">Vedi i prezzi</p>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPackPaymentIntent, stripe } from "@/lib/stripe";
-import { getPlanBySku, isSubscriptionPlan, PlanSku, SITE } from "@/lib/pricing";
+import { getPlanBySku, PlanSku, SITE } from "@/lib/pricing";
 import { ensureGuestUser } from "@/lib/credits";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { cleanQuery, lookupVehicle } from "@/lib/vehicle";
@@ -58,17 +58,14 @@ export async function POST(req: NextRequest) {
 
     const guest = await ensureGuestUser(email);
     const now = Date.now();
-    const isSubscription = isSubscriptionPlan(plan);
-    const introAmountCents = isSubscription
-      ? Math.round(plan.subscription.introPrice * 100)
-      : Math.round(plan.price * 100);
+    const amountCents = Math.round(plan.price * 100);
 
     const orderRef = await db.collection("orders").add({
       status: "PENDING",
       site: SITE.domain,
       sku: plan.sku,
       productName: plan.name,
-      amount: introAmountCents,
+      amount: amountCents,
       currency: "eur",
       country: "IT",
       customerEmail: email,
@@ -81,12 +78,7 @@ export async function POST(req: NextRequest) {
       newAccount: guest.newAccount,
       guestCheckout: true,
       password: guest.password || null,
-      orderType: isSubscription ? "subscription_intro" : "one_time",
-      recurringAmount: isSubscription
-        ? Math.round(plan.subscription.recurringPrice * 100)
-        : null,
-      subscriptionTrialHours: isSubscription ? plan.subscription.trialHours : null,
-      recurringCredits: isSubscription ? plan.subscription.recurringCredits : null,
+      orderType: "one_time",
       createdAt: now,
       updatedAt: now,
       processingLogs: [`[${new Date(now).toISOString()}] Ordine creato, in attesa pagamento Stripe.`],
@@ -103,16 +95,15 @@ export async function POST(req: NextRequest) {
       country: "IT",
       searchValue: vehicleInfo.searchValue || "",
       searchType: vehicleInfo.searchType || "",
-      orderType: isSubscription ? "subscription_intro" : "one_time",
+      orderType: "one_time",
     };
 
     const paymentIntent = await createPackPaymentIntent({
       sku: plan.sku,
       email,
       productName: `${plan.name} — ${SITE.name}`,
-      amountCents: introAmountCents,
+      amountCents,
       metadata,
-      savePaymentMethod: isSubscription,
     });
 
     await orderRef.update({
@@ -132,11 +123,7 @@ export async function POST(req: NextRequest) {
       clientSecret: paymentIntent.client_secret,
       orderId,
       paymentIntentId: paymentIntent.id,
-      isSubscription,
-      introAmount: introAmountCents / 100,
-      recurringAmount: isSubscription ? plan.subscription.recurringPrice : null,
-      trialHours: isSubscription ? plan.subscription.trialHours : null,
-      subscriptionTerms: isSubscription ? plan.subscription : null,
+      amount: amountCents / 100,
     });
   } catch (error) {
     console.error("[prepare-checkout]", error);

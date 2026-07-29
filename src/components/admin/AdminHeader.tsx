@@ -10,7 +10,6 @@ import { useAuth } from "@/context/AuthContext";
 const NAV = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/orders", label: "Ordini" },
-  { href: "/admin/subscriptions", label: "Abbonamenti" },
   { href: "/admin/clients", label: "Clienti" },
   { href: "/admin/users", label: "Utenti" },
   { href: "/admin/reports", label: "Report" },

@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ReportsList from "@/components/account/ReportsList";
-import SubscriptionPanel from "@/components/account/SubscriptionPanel";
 import { useAuth } from "@/context/AuthContext";
 import { useCredits } from "@/hooks/useCredits";
 import { ACCOUNT_UI } from "@/lib/account-ui-text";
@@ -261,8 +260,6 @@ export default function AccountClient() {
 
           {/* Side column */}
           <aside className="space-y-5">
-            <SubscriptionPanel />
-
             <section className="card-surface p-5 sm:p-6">
               <h3 className="mb-4 text-sm font-semibold text-brand">Azioni rapide</h3>
               <div className="space-y-2.5">

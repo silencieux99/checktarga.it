@@ -6,7 +6,7 @@ import { buildPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildPageMetadata({
   title: "Condizioni generali di vendita",
   description:
-    "Condizioni generali di vendita di CheckTarga.it gestito da MG COMPANY DAYA LTD: abbonamenti, report veicolo, disdetta, recesso e responsabilità.",
+    "Condizioni generali di vendita di CheckTarga.it gestito da MG COMPANY DAYA LTD: pacchetti report, pagamenti, recesso e responsabilità.",
   path: "/termini",
 });
 

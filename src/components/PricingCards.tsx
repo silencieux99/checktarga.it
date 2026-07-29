@@ -1,11 +1,6 @@
 import Link from "next/link";
-import {
-  formatPrice,
-  formatSubscriptionIntroLabel,
-  formatSubscriptionRecurringLabel,
-  getVisiblePricingPlans,
-} from "@/lib/pricing";
-import { Check, RefreshCw } from "lucide-react";
+import { formatPrice, getVisiblePricingPlans } from "@/lib/pricing";
+import { Check } from "lucide-react";
 
 interface PricingCardsProps {
   checkoutBasePath?: string;
@@ -23,7 +18,7 @@ export default function PricingCards({
   const plans = getVisiblePricingPlans();
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
       {plans.map((plan) => {
         const params = new URLSearchParams({ sku: plan.sku });
         if (vehicle) params.set("value", vehicle);
@@ -46,17 +41,20 @@ export default function PricingCards({
             <h3 className="text-lg font-bold text-brand">{plan.name}</h3>
             <p className="mt-1 text-sm text-brand-muted">{plan.description}</p>
 
-            <div className="mb-4 mt-5 space-y-2">
+            <div className="mb-4 mt-5">
               <div className="flex items-end gap-2">
-                <span className="text-3xl font-bold text-brand">
-                  {formatSubscriptionIntroLabel(plan)}
-                </span>
-                <span className="mb-1 text-sm text-brand-muted">oggi</span>
+                <span className="text-3xl font-bold text-brand">{formatPrice(plan.price)}</span>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-brand-border bg-brand-surface px-3 py-1 text-xs font-medium text-brand-accent">
-                <RefreshCw className="h-3.5 w-3.5" />
-                poi {formatSubscriptionRecurringLabel(plan)}
-              </div>
+              {plan.promoText ? (
+                <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-brand-accent">
+                  {plan.promoText}
+                </p>
+              ) : null}
+              {plan.reports > 1 ? (
+                <p className="mt-1 text-xs text-brand-muted">
+                  {plan.reports} report · {formatPrice(plan.unitPrice)} cad.
+                </p>
+              ) : null}
             </div>
 
             <ul className="mb-6 flex-1 space-y-2">
@@ -72,9 +70,7 @@ export default function PricingCards({
               href={ctaHref}
               className={plan.highlight ? "btn-accent text-center" : "btn-primary text-center"}
             >
-              {ctaMode === "hero"
-                ? "Inizia la verifica"
-                : `Inizia a ${formatPrice(plan.subscription!.introPrice)}`}
+              {ctaMode === "hero" ? "Inizia la verifica" : `Acquista a ${formatPrice(plan.price)}`}
             </Link>
           </div>
         );

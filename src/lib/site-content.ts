@@ -140,7 +140,7 @@ export const TESTIMONIALS = {
       initials: "AF",
       name: "Anna F.",
       date: "Aprile 2026",
-      text: "Assistenza in italiano impeccabile. Hanno risposto in meno di 24 ore e risolto ogni mio dubbio sull'abbonamento.",
+      text: "Assistenza in italiano impeccabile. Hanno risposto in meno di 24 ore e risolto ogni mio dubbio sull'acquisto.",
     },
   ],
 };
@@ -149,9 +149,9 @@ export const PRICING_TEASER = {
   label: "Prezzi trasparenti",
   title: "Il tuo report è a pochi clic di distanza.",
   subtitle:
-    "Offerta introduttiva da 4,99 € con rinnovo ogni 4 settimane dopo 48 ore. Ogni piano include report basato sui dati disponibili, crediti periodici e garanzia 14 giorni.",
-  benefits: ["Report basato sui dati disponibili", "Crediti periodici inclusi", "Garanzia 14 giorni"],
-  cta: "Scegli il piano",
+    "Pacchetti da 15,99 €: pagamento unico, crediti subito disponibili e garanzia 14 giorni.",
+  benefits: ["Report basato sui dati disponibili", "Crediti subito sul tuo account", "Garanzia 14 giorni"],
+  cta: "Scegli il pacchetto",
 };
 
 export const FAQ_ITEMS = [
@@ -176,14 +176,9 @@ export const FAQ_ITEMS = [
       "Inserisci la targa italiana o il VIN nella home page, consulta l'anteprima gratuita e completa il pagamento. Dopo la conferma, i crediti sono subito disponibili nella tua area personale.",
   },
   {
-    question: "Come funziona l'abbonamento?",
+    question: "Quanto costano i pacchetti?",
     answer:
-      "Paghi un importo introduttivo (4,99 € o 6,99 €) e ricevi subito i crediti. Dopo 48 ore parte il rinnovo automatico ogni 4 settimane sulla carta salvata. Puoi annullare in qualsiasi momento dall'area personale.",
-  },
-  {
-    question: "Come annullare l'abbonamento?",
-    answer:
-      "Accedi al tuo account, vai su Il mio account, seleziona Gestisci abbonamento e clicca su Annulla abbonamento. Puoi anche consultare la pagina Disdetta per i passaggi dettagliati.",
+      "1 report a 15,99 €, 6 report (3+3 in regalo) a 23,99 €, 10 report (5+5) a 34,99 € e 20 report (10+10) a 49,99 €. Pagamento unico, senza rinnovo automatico.",
   },
   {
     question: "Come funziona il rimborso?",
@@ -241,8 +236,6 @@ export const FOOTER_COLUMNS = [
       { label: "Chi siamo", href: "/chi-siamo" },
       { label: "Contatti", href: "/contatti" },
       { label: "Esempio report", href: "/esempio-report" },
-      { label: "Abbonamento", href: "/abbonamento" },
-      { label: "Disdetta", href: "/disdetta" },
     ],
   },
   {

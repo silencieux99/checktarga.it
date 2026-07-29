@@ -96,10 +96,6 @@ export async function POST(req: NextRequest) {
       currency: order.currency || "eur",
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-      isSubscription: order.orderType === "subscription_intro",
-      recurringAmount: order.recurringAmount ? order.recurringAmount / 100 : null,
-      subscriptionNextBillingAt: order.subscriptionNextBillingAt || null,
-      subscriptionTrialHours: order.subscriptionTrialHours || null,
     });
   } catch (error) {
     console.error("[check-order-status]", error);

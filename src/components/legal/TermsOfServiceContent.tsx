@@ -1,12 +1,8 @@
 import Link from "next/link";
 import LegalCompanyBlock from "@/components/legal/LegalCompanyBlock";
 import PrivateServiceDisclaimer from "@/components/legal/PrivateServiceDisclaimer";
-import {
-  COMPANY,
-  DATA_VARIABILITY_NOTICE,
-  SUBSCRIPTION_PRE_PAYMENT_NOTICE,
-} from "@/lib/company";
-import { SITE, SUBSCRIPTION_BILLING_INTERVAL_COUNT, SUBSCRIPTION_TRIAL_HOURS } from "@/lib/pricing";
+import { COMPANY, DATA_VARIABILITY_NOTICE } from "@/lib/company";
+import { SITE, PRICING_PLANS, formatPrice } from "@/lib/pricing";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -105,8 +101,8 @@ export default function TermsOfServiceContent() {
               Servizio per scopi commerciali, industriali, artigianali o professionali.
             </li>
             <li>
-              <strong>Abbonamento</strong>: piano a pagamento con rinnovo automatico che consente
-              l&apos;accesso periodico a crediti per la generazione di Report.
+              <strong>Pacchetto</strong>: acquisto one-shot di uno o più crediti per la generazione
+              di Report, senza rinnovo automatico.
             </li>
             <li>
               <strong>Utente</strong>: qualsiasi persona che utilizza {SITE.domain}, a titolo
@@ -143,8 +139,8 @@ export default function TermsOfServiceContent() {
           <p>
             Per accedere a determinati Servizi, è necessario creare un Account fornendo un
             indirizzo email valido e una password (o utilizzando le credenziali comunicate dopo
-            l&apos;acquisto). L&apos;Account consente di gestire l&apos;abbonamento, consultare i
-            Report generati e visualizzare i crediti disponibili.
+            l&apos;acquisto). L&apos;Account consente di consultare i Report generati e visualizzare
+            i crediti disponibili.
           </p>
         </Sub>
         <Sub title="3.2. Sicurezza dell'account">
@@ -162,9 +158,8 @@ export default function TermsOfServiceContent() {
           <p>
             Puoi richiedere la cancellazione del tuo Account contattando il supporto o utilizzando
             le funzioni disponibili nell&apos;area personale. La cancellazione può comportare la
-            perdita dell&apos;accesso ai Report già generati e alla gestione dell&apos;abbonamento
-            attivo, fatti salvi gli obblighi di legge e le disposizioni sul recesso o sui
-            pagamenti già effettuati.
+            perdita dell&apos;accesso ai Report già generati e ai crediti residui, fatti salvi gli
+            obblighi di legge e le disposizioni sul recesso o sui pagamenti già effettuati.
           </p>
         </Sub>
         <Sub title="3.4. Sospensione o risoluzione">
@@ -176,12 +171,12 @@ export default function TermsOfServiceContent() {
         </Sub>
       </Section>
 
-      <Section id="abbonamenti" title="4. Abbonamenti, prezzi e vantaggi">
+      <Section id="prezzi" title="4. Pacchetti, prezzi e vantaggi">
         <p>
           {SITE.name} ti aiuta a prendere decisioni consapevoli sui veicoli che ti interessano. I
-          nostri piani di abbonamento offrono accesso ai Report sullo storico automobilistico,
-          permettendoti di verificare rapidamente il passato di un veicolo, potenziali criticità e
-          lo stato generale prima di investire tempo o denaro.
+          pacchetti one-shot offrono accesso ai Report sullo storico automobilistico, permettendoti
+          di verificare rapidamente il passato di un veicolo, potenziali criticità e lo stato
+          generale prima di investire tempo o denaro.
         </p>
 
         <Sub title="4.1. Cosa ti offre CheckTarga.it?">
@@ -205,68 +200,20 @@ export default function TermsOfServiceContent() {
           </ul>
         </Sub>
 
-        <Sub title="4.2. Opzioni di abbonamento">
-          <p>
-            <strong>Piano 1 Report — Offerta introduttiva</strong>
-          </p>
-          <ul className="list-disc space-y-1 pl-5">
-            <li>Oggi paghi: 4,99 €</li>
-            <li>Crediti immediati: 1 Report</li>
-            <li>
-              Include: 1 report immediato
-            </li>
-            <li>
-              Dopo {SUBSCRIPTION_TRIAL_HOURS} ore: abbonamento a 29,99 € ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane
-            </li>
-            <li>Rinnovo automatico fino alla disdetta</li>
-            <li>
-              Puoi annullare in qualsiasi momento dal tuo account (vedi{" "}
-              <Link href="/disdetta" className="text-brand-accent underline underline-offset-2">
-                Disdetta
-              </Link>
-              ).
-            </li>
+        <Sub title="4.2. Pacchetti disponibili">
+          <p>I prezzi e i crediti sono i seguenti (pagamento unico, senza rinnovo automatico):</p>
+          <ul className="mt-3 list-disc space-y-2 pl-5">
+            {PRICING_PLANS.map((plan) => (
+              <li key={plan.sku}>
+                <strong>{plan.name}</strong> — {formatPrice(plan.price)} · {plan.reports} credito
+                {plan.reports > 1 ? "i" : ""}
+              </li>
+            ))}
           </ul>
-
           <p className="mt-4">
-            <strong>Piano 5 Report — Offerta introduttiva</strong>
-          </p>
-          <ul className="list-disc space-y-1 pl-5">
-            <li>Oggi paghi: 6,99 €</li>
-            <li>Crediti immediati: 5 Report</li>
-            <li>
-              Dopo {SUBSCRIPTION_TRIAL_HOURS} ore: abbonamento a 39,99 € ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane
-            </li>
-            <li>Rinnovo automatico fino alla disdetta</li>
-            <li>
-              Puoi annullare in qualsiasi momento dal tuo account (vedi{" "}
-              <Link href="/disdetta" className="text-brand-accent underline underline-offset-2">
-                Disdetta
-              </Link>
-              ).
-            </li>
-          </ul>
-
-          <p className="mt-4">
-            <strong>Cosa succede dopo il pagamento iniziale?</strong>
-          </p>
-          <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-900">
-            {SUBSCRIPTION_PRE_PAYMENT_NOTICE}
-          </p>
-          <p className="mt-4">
-            L&apos;abbonamento inizia con il pagamento dell&apos;offerta introduttiva. Al momento del
-            checkout, la carta di pagamento viene salvata in modo sicuro tramite Stripe per
-            consentire i rinnovi automatici. Trascorse {SUBSCRIPTION_TRIAL_HOURS} ore dal primo
-            pagamento, l&apos;abbonamento si rinnova automaticamente al prezzo ricorrente indicato
-            sopra, ogni {SUBSCRIPTION_BILLING_INTERVAL_COUNT} settimane, fino a disdetta. Puoi
-            annullare in qualsiasi momento dall&apos;area personale o contattando il supporto prima
-            del prossimo addebito. Per dettagli, consulta{" "}
-            <Link href="/abbonamento" className="text-brand-accent underline underline-offset-2">
-              Abbonamento
-            </Link>{" "}
-            e{" "}
-            <Link href="/disdetta" className="text-brand-accent underline underline-offset-2">
-              Disdetta
+            Per i dettagli commerciali aggiornati consulta la pagina{" "}
+            <Link href="/prezzi" className="text-brand-accent underline underline-offset-2">
+              Prezzi
             </Link>
             .
           </p>
@@ -274,10 +221,8 @@ export default function TermsOfServiceContent() {
 
         <Sub title="4.3. Utilizzo dei Report">
           <p>
-            <strong>4.3.1. Numero di Report</strong> — Ogni piano prevede un numero determinato di
-            crediti per periodo di fatturazione. I crediti non utilizzati entro il ciclo non sono
-            generalmente trasferibili al periodo successivo, salvo diversa comunicazione scritta da
-            parte nostra.
+            <strong>4.3.1. Numero di Report</strong> — Ogni pacchetto prevede un numero determinato di
+            crediti. I crediti restano disponibili sull&apos;account fino al loro utilizzo.
           </p>
           <p>
             <strong>4.3.2. Accesso al Report</strong> — Ogni Report è generato in base alla targa o
@@ -296,50 +241,31 @@ export default function TermsOfServiceContent() {
             dati.
           </p>
           <p>
-            <strong>4.3.5. Responsabilità dell'utente</strong> — L&apos;utente assume la piena
+            <strong>4.3.5. Responsabilità dell&apos;utente</strong> — L&apos;utente assume la piena
             responsabilità delle decisioni prese sulla base delle informazioni contenute nel Report.
           </p>
         </Sub>
 
         <Sub title="4.4. Pagamenti">
           <p>
-            I pagamenti sono elaborati da Stripe. {SITE.name} non memorizza i dati completi della
-            carta. L&apos;utente autorizza l&apos;addebito del pagamento iniziale e dei rinnovi
-            successivi secondo il piano scelto, fino a disdetta dell&apos;abbonamento.
+            I pagamenti sono elaborati da Stripe in modalità one-shot. {SITE.name} non memorizza i
+            dati completi della carta. L&apos;utente autorizza l&apos;addebito unico del pacchetto
+            scelto al momento del checkout.
           </p>
         </Sub>
       </Section>
 
-      <Section id="disdetta" title="5. Condizioni di disdetta">
-        <Sub title="5.1. Come disdire">
+      <Section id="account-crediti" title="5. Crediti e account">
+        <Sub title="5.1. Disponibilità dei crediti">
           <p>
-            Puoi disdire l&apos;abbonamento in qualsiasi momento dall&apos;area personale (sezione
-            abbonamento) o scrivendo a{" "}
-            <a href={`mailto:${SITE.supportEmail}`} className="text-brand-accent underline">
-              {SITE.supportEmail}
-            </a>
-            .
-          </p>
-          <p>
-            Per le istruzioni passo-passo, visita{" "}
-            <Link href="/disdetta" className="text-brand-accent underline underline-offset-2">
-              Disdetta
-            </Link>
-            .
+            Dopo il pagamento, i crediti vengono accreditati sull&apos;account associato all&apos;email
+            indicata in checkout e possono essere utilizzati per generare Report.
           </p>
         </Sub>
-        <Sub title="5.2. Decorrenza della disdetta">
+        <Sub title="5.2. Nessun rinnovo automatico">
           <p>
-            Dopo la disdetta, manterrai l&apos;accesso ai crediti e ai Servizi già pagati fino alla
-            fine del ciclo di fatturazione in corso. Non verranno effettuati ulteriori addebiti
-            automatici, salvo riattivazione volontaria dell&apos;abbonamento.
-          </p>
-        </Sub>
-        <Sub title="5.3. Nessun rimborso proporzionale">
-          <p>
-            Salvo quanto previsto dalla legge applicabile o dal diritto di recesso (sezione 7),{" "}
-            {SITE.name} non effettua rimborsi parziali o proporzionali per disdette effettuate a
-            ciclo già iniziato.
+            I pacchetti non prevedono abbonamenti né addebiti ricorrenti. Eventuali nuovi acquisti
+            richiedono un nuovo checkout esplicito.
           </p>
         </Sub>
       </Section>
@@ -348,9 +274,9 @@ export default function TermsOfServiceContent() {
         <Sub title="6.1. Regola generale">
           <p>
             Fatto salvo quanto indicato nella sezione 7 (Diritto di recesso) per i consumatori UE/Italia
-            o quanto imposto dalla legge, {SITE.name} non offre rimborsi per i canoni di abbonamento
-            una volta iniziato il relativo ciclo di fatturazione, qualora i Servizi siano stati resi
-            disponibili.
+            o quanto imposto dalla legge, {SITE.name} non offre rimborsi per i pacchetti già
+            acquistati una volta che i relativi crediti sono stati resi disponibili, salva la
+            garanzia di cui alla sezione 6.3 e il diritto di recesso ove applicabile.
           </p>
         </Sub>
         <Sub title="6.2. Circostanze eccezionali">
@@ -385,10 +311,10 @@ export default function TermsOfServiceContent() {
         </Sub>
         <Sub title="7.2. Rinuncia per contenuto digitale immediato">
           <p>
-            Acquistando e generando un Report, oppure utilizzando i crediti associati
-            all&apos;abbonamento, il consumatore richiede l&apos;esecuzione immediata del servizio
-            digitale e riconosce che, una volta iniziato l&apos;utilizzo, può perdere il diritto di
-            recesso per quel periodo, nei limiti consentiti dalla legge.
+            Acquistando e generando un Report, oppure utilizzando i crediti del pacchetto, il
+            consumatore richiede l&apos;esecuzione immediata del servizio digitale e riconosce
+            che, una volta iniziato l&apos;utilizzo, può perdere il diritto di recesso per quel
+            periodo, nei limiti consentiti dalla legge.
           </p>
         </Sub>
         <Sub title="7.3. Come esercitare il recesso">
@@ -397,7 +323,7 @@ export default function TermsOfServiceContent() {
             <a href={`mailto:${SITE.supportEmail}`} className="text-brand-accent underline">
               {SITE.supportEmail}
             </a>{" "}
-            indicando email dell&apos;Account, data dell&apos;acquisto e piano sottoscritto.
+            indicando email dell&apos;Account, data dell&apos;acquisto e pacchetto acquistato.
           </p>
         </Sub>
       </Section>
@@ -499,10 +425,9 @@ export default function TermsOfServiceContent() {
       <Section id="trasferimento" title="13. Trasferimento di proprietà">
         <p>
           In caso di vendita, fusione o trasferimento di {SITE.name} a un&apos;altra società
-          (&quot;Nuovo proprietario&quot;), gli abbonamenti attivi potranno continuare sotto la
-          gestione del Nuovo proprietario. Gli abbonati manterranno le condizioni in corso — prezzi,
-          calendario di rinnovo e funzionalità — salvo comunicazione contraria esplicita. Per
-          domande o disdetta in seguito a un cambio di proprietà, contatta{" "}
+          (&quot;Nuovo proprietario&quot;), gli account e i crediti residui potranno continuare sotto
+          la gestione del Nuovo proprietario, salvo comunicazione contraria esplicita. Per domande
+          in seguito a un cambio di proprietà, contatta{" "}
           <a href={`mailto:${SITE.supportEmail}`} className="text-brand-accent underline">
             {SITE.supportEmail}
           </a>
@@ -512,7 +437,7 @@ export default function TermsOfServiceContent() {
 
       <Section id="contatti" title="14. Contatti">
         <p>
-          Per domande sulle presenti Condizioni, per disdire o modificare l&apos;abbonamento:
+          Per domande sulle presenti Condizioni o sul tuo account:
         </p>
         <ul className="list-none space-y-1 pl-0">
           <li>
